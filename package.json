@@ -1,0 +1,15 @@
+{
+    "name": "tbd-blog",
+    "version": "0.0.1",
+    "description": "Team TBD Blog App",
+    "main": "index.js",
+    "scripts": {
+    "start": "node server.js"
+    },
+    "dependencies": {
+      "express": "4.18.2"
+    },
+    "engines": {
+      "node": "20.11.1"
+    }
+  }
