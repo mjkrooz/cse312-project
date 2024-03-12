@@ -1,5 +1,4 @@
 const mongoose = require('mongoose')
-const uniqueValidator = require('mongoose-unique-validator')
 
 const userSchema = new mongoose.Schema(
     {
@@ -7,7 +6,6 @@ const userSchema = new mongoose.Schema(
             type: String,
             required: true,
             minlength:3,
-            unique: true
         },
 
         passwordHash: String
