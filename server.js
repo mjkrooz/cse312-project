@@ -6,10 +6,6 @@ const {validatePassword} = require('./util/validate_credentials')
 const bcrypt = require('bcrypt')
 const User = require('./models/user')
 
-// Set the `X-Content-Type-Options: nosniff` on all requests. Must come first in this file.
-
-
-// Register `GET /` for the index.
 
 app.get('/', (req, res) => {
 
@@ -57,7 +53,7 @@ app.post('/register',async (req,res)=>{
 
    // user = await user.save() //save user to our collection
 
-    res.status(200).redirect('/')
+    res.status(302).redirect('/')
 
     
   
