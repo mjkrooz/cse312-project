@@ -6,6 +6,11 @@ const {validatePassword} = require('./util/validate_credentials')
 const bcrypt = require('bcrypt')
 const User = require('./models/user')
 
+app.use(function(req, res, next) {
+
+  res.append('X-Content-Type-Options', 'nosniff');
+  next();
+});
 
 app.get('/', (req, res) => {
 
@@ -24,6 +29,10 @@ app.get('/', (req, res) => {
 
   res.sendFile(__dirname + '/src/public/index.html');
 });
+
+app.get('/function.js',(req,res)=>{
+  res.sendFile(__dirname+'/src/public/function.js')
+})
 
 app.post('/register',async (req,res)=>{
 
