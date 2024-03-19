@@ -7,7 +7,7 @@ const bcrypt = require('bcrypt')
 const mongoose = require('mongoose')
 const User = require('./models/user')
 const Post = require('./models/post')
-const Comment = require('./models/comment')
+const { Comment, Report } = require('./models/comment')
 
 app.use(function(req, res, next) {
 
@@ -72,6 +72,19 @@ app.post('/register',async (req,res)=>{
 
 })
 
+/**
+ * 
+ * 
+ * Blog Post API Endpoints
+ * 
+ * 
+ */
+
+// Ensure all API endpoints are parsing the request body as JSON.
+// Note that this applies the middleware to all routes that follow it.
+
+app.use(express.json());
+
 // Get all blog posts.
 
 app.get('/api/v1/posts', async (req, res) => {
@@ -87,7 +100,17 @@ app.get('/api/v1/posts', async (req, res) => {
 
 app.post('/api/v1/posts', async (req, res) => {
 
-  console.log(req.body);
+  mongoose.connect('mongodb://db:27017/cse312');
+
+  const post = new Post(req.body);
+
+  post.user_id = '65f9b0c3da893c266cd903b1'; // TODO: use the current user's user ID.
+
+  console.log(post);
+
+  await post.save();
+
+  res.sendStatus(201); // TODO: return the post contents.
 });
 
 // Get all comments on a particuar blog post.
@@ -102,14 +125,43 @@ app.get('/api/v1/posts/:id/comments', async (req, res) => {
 });
 
 // Create a comment on a particular blog post.
+// TODO: sanitization.
 
 app.post('/api/v1/posts/:id/comments', async (req, res) => {
 
   mongoose.connect('mongodb://db:27017/cse312');
 
-  console.log(req.body);
+  // Verify that the blog post actually exists.
 
+  try {
 
+    const post = await Post.findById(req.params.id);
+
+    if (post === null) {
+  
+      return res.status(404).send({error: "Blog post not found"});
+    }
+
+    console.log(post);
+  } catch (error) {
+
+    console.log(error);
+
+    return res.sendStatus(500); // TODO: check if BSON error then 404?
+  }
+
+  // Create the comment.
+
+  const comment = new Comment(req.body);
+
+  comment.post_id = req.params.id;
+  comment.user_id = '65f9b0c3da893c266cd903b1'; // TODO: use the current user's user ID.
+
+  await comment.save();
+
+  console.log(comment);
+
+  res.sendStatus(201); // TODO: return the comment contents.
 });
 
 // Get a specific comment from its ID.
@@ -131,12 +183,43 @@ app.post('/api/v1/comments/:id/report', async (req, res) => {
 
   mongoose.connect('mongodb://db:27017/cse312');
 
-  const comment = Comment.findById(req.params.id);
+  // Verify that the comment actually exists.
 
-  console.log(req.body);
+  let comment = null;
 
-  //comment.reports.append()
+  try {
 
+    comment = await Comment.findById(req.params.id);
+
+    if (comment === null) {
+  
+      return res.status(404).send({error: "Comment not found"});
+    }
+
+    console.log(comment);
+  } catch (error) {
+
+    console.log(error);
+
+    return res.sendStatus(500); // TODO: check if BSON error then 404?
+  }
+
+  // Create the report.
+
+  const report = new Report(req.body);
+
+  report.reporter = '65f9b0c3da893c266cd903b1'; // TODO: use the current user's user ID.
+
+  // Attach the report to the comment and save it.
+
+  comment.reports.push(report);
+
+  await comment.save();
+
+  console.log(comment);
+  console.log(report);
+
+  res.sendStatus(201); // TODO: return the report contents.
 });
 
 // Get a user by their ID.

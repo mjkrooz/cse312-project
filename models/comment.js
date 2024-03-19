@@ -7,7 +7,10 @@ const reportSchema = new mongoose.Schema({
     // The ObjectId of the user that submitted the report.
     // If empty, a guest reported it? TODO: determine if we need guest interactions.
 
-    reporter: mongoose.Schema.ObjectId,
+    reporter: {
+        type: mongoose.Schema.ObjectId,
+        required: true
+    },
 
     // The report itself. Can be empty if the message is obviously in need of moderation.
 
@@ -66,5 +69,6 @@ const commentSchema = new mongoose.Schema(
 )
 
 const Comment = mongoose.model('Comment', commentSchema)
+const Report = mongoose.model('Report', reportSchema)
 
-module.exports = Comment
+module.exports = { Comment, Report }
