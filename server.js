@@ -5,6 +5,8 @@ const bodyParser = require('body-parser');
 const {validatePassword} = require('./util/validate_credentials')
 const bcrypt = require('bcrypt')
 const User = require('./models/user')
+const Post = require('./model/post')
+const Comment = require('./model/comment')
 
 app.use(function(req, res, next) {
 
