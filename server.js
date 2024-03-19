@@ -11,6 +11,7 @@ const { Comment, Report } = require('./models/comment')
 
 app.use(function(req, res, next) {
 
+  mongoose.connect('mongodb://db:27017/cse312');
   res.append('X-Content-Type-Options', 'nosniff');
   next();
 });
@@ -89,8 +90,6 @@ app.use(express.json());
 
 app.get('/api/v1/posts', async (req, res) => {
 
-  mongoose.connect('mongodb://db:27017/cse312');
-
   const posts = await Post.find({});
 
   return res.send(posts);
@@ -99,8 +98,6 @@ app.get('/api/v1/posts', async (req, res) => {
 // Create a new blog post.
 
 app.post('/api/v1/posts', async (req, res) => {
-
-  mongoose.connect('mongodb://db:27017/cse312');
 
   const post = new Post(req.body);
 
@@ -117,8 +114,6 @@ app.post('/api/v1/posts', async (req, res) => {
 
 app.get('/api/v1/posts/:id/comments', async (req, res) => {
 
-  mongoose.connect('mongodb://db:27017/cse312');
-  
   const comments = await Comment.find({"post_id": req.params.id, "deleted": false});
 
   res.send(comments);
@@ -128,8 +123,6 @@ app.get('/api/v1/posts/:id/comments', async (req, res) => {
 // TODO: sanitization.
 
 app.post('/api/v1/posts/:id/comments', async (req, res) => {
-
-  mongoose.connect('mongodb://db:27017/cse312');
 
   // Verify that the blog post actually exists.
 
@@ -168,8 +161,6 @@ app.post('/api/v1/posts/:id/comments', async (req, res) => {
 
 app.get('/api/v1/comments/:id', async (req, res) => {
 
-  mongoose.connect('mongodb://db:27017/cse312');
-
   const comment = await Comment.findById(req.params.id);
 
   console.log(comment);
@@ -180,8 +171,6 @@ app.get('/api/v1/comments/:id', async (req, res) => {
 // Report a comment.
 
 app.post('/api/v1/comments/:id/report', async (req, res) => {
-
-  mongoose.connect('mongodb://db:27017/cse312');
 
   // Verify that the comment actually exists.
 
@@ -225,8 +214,6 @@ app.post('/api/v1/comments/:id/report', async (req, res) => {
 // Get a user by their ID.
 
 app.get('/api/v1/users/:id', async (req, res) => {
-
-  mongoose.connect('mongodb://db:27017/cse312');
 
   const user = await User.findById(req.params.id).select('username');
 
