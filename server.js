@@ -80,44 +80,76 @@ app.get('/api/v1/posts', async (req, res) => {
 
   const posts = await Post.find({});
 
-  console.log(posts);
-
   return res.send(posts);
 });
 
 // Create a new blog post.
 
-app.post('/api/v1/posts', (req, res) => {
+app.post('/api/v1/posts', async (req, res) => {
 
-
+  console.log(req.body);
 });
 
 // Get all comments on a particuar blog post.
 
-app.get('/api/v1/posts/:id/comments', (req, res) => {
+app.get('/api/v1/posts/:id/comments', async (req, res) => {
 
+  mongoose.connect('mongodb://db:27017/cse312');
+  
+  const comments = await Comment.find({"post_id": req.params.id, "deleted": false});
 
+  res.send(comments);
 });
 
 // Create a comment on a particular blog post.
 
-app.post('/api/v1/posts/:id/comments', (req, res) => {
+app.post('/api/v1/posts/:id/comments', async (req, res) => {
+
+  mongoose.connect('mongodb://db:27017/cse312');
+
+  console.log(req.body);
 
 
 });
 
 // Get a specific comment from its ID.
 
-app.get('/api/v1/comments/:id', (req, res) => {
+app.get('/api/v1/comments/:id', async (req, res) => {
 
+  mongoose.connect('mongodb://db:27017/cse312');
 
+  const comment = await Comment.findById(req.params.id);
+
+  console.log(comment);
+
+  res.send(comment);
 })
 
 // Report a comment.
 
-app.post('/api/v1/comments/:id/report', (req, res) => {
+app.post('/api/v1/comments/:id/report', async (req, res) => {
 
+  mongoose.connect('mongodb://db:27017/cse312');
 
+  const comment = Comment.findById(req.params.id);
+
+  console.log(req.body);
+
+  //comment.reports.append()
+
+});
+
+// Get a user by their ID.
+
+app.get('/api/v1/users/:id', async (req, res) => {
+
+  mongoose.connect('mongodb://db:27017/cse312');
+
+  const user = await User.findById(req.params.id).select('username');
+
+  console.log(user);
+
+  res.send(user);
 });
 
 // Register `src/public` for remaining static routes.
