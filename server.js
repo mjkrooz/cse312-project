@@ -68,6 +68,49 @@ app.post('/register',async (req,res)=>{
   
 
 })
+
+// Get all blog posts.
+
+app.get('/api/v1/posts', (req, res) => {
+
+  
+});
+
+// Create a new blog post.
+
+app.post('/api/v1/posts', (req, res) => {
+
+
+});
+
+// Get all comments on a particuar blog post.
+
+app.get('/api/v1/posts/:id/comments', (req, res) => {
+
+
+});
+
+// Create a comment on a particular blog post.
+
+app.post('/api/v1/posts/:id/comments', (req, res) => {
+
+
+});
+
+// Get a specific comment from its ID.
+
+app.get('/api/v1/comments/:id', (req, res) => {
+
+
+})
+
+// Report a comment.
+
+app.post('/api/v1/comments/:id/report', (req, res) => {
+
+
+});
+
 // Register `src/public` for remaining static routes.
 
 app.use(express.static('src/public'));
