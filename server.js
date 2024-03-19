@@ -4,9 +4,10 @@ const port = 8080;
 const bodyParser = require('body-parser');
 const {validatePassword} = require('./util/validate_credentials')
 const bcrypt = require('bcrypt')
+const mongoose = require('mongoose')
 const User = require('./models/user')
-const Post = require('./model/post')
-const Comment = require('./model/comment')
+const Post = require('./models/post')
+const Comment = require('./models/comment')
 
 app.use(function(req, res, next) {
 
@@ -73,9 +74,15 @@ app.post('/register',async (req,res)=>{
 
 // Get all blog posts.
 
-app.get('/api/v1/posts', (req, res) => {
+app.get('/api/v1/posts', async (req, res) => {
 
-  
+  mongoose.connect('mongodb://db:27017/cse312');
+
+  const posts = await Post.find({});
+
+  console.log(posts);
+
+  return res.send(posts);
 });
 
 // Create a new blog post.

@@ -5,7 +5,7 @@ const postSchema = new mongoose.Schema(
         // ObjectId of the user that made the blog post.
 
         user_id: {
-            type: Schema.ObjectId,
+            type: mongoose.Schema.ObjectId,
             required: true
         },
 
