@@ -73,10 +73,10 @@ app.post('/register',async (req,res)=>{
 
 })
 
-// Register API routes.
+// Register API routes. All endpoints parse the body as JSON.
 
 const apiRoutes = require('./routes/api')
-app.use('/api/v1', apiRoutes);
+app.use('/api/v1', express.json(), apiRoutes);
 
 // Register `src/public` for remaining static routes.
 

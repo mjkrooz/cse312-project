@@ -13,11 +13,6 @@ const Post = require('../models/post');
 const { Comment, Report } = require('../models/comment');
 const User = require('../models/user');
 
-// Ensure all API endpoints are parsing the request body as JSON.
-// Note that this applies the middleware to all routes that follow it.
-
-app.use(express.json());
-
 // Get all blog posts.
 
 app.get('/posts', async (req, res) => {
