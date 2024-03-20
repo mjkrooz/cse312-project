@@ -6,11 +6,12 @@
  * 
  */
 
-const express = require('express')
+const express = require('express');
 const app = express.Router();
-const Post = require('../models/post')
-const { Comment, Report } = require('../models/comment')
-const User = require('../models/user')
+const authenticate = require('../middleware/authenticate');
+const Post = require('../models/post');
+const { Comment, Report } = require('../models/comment');
+const User = require('../models/user');
 
 // Ensure all API endpoints are parsing the request body as JSON.
 // Note that this applies the middleware to all routes that follow it.
@@ -28,13 +29,11 @@ app.get('/posts', async (req, res) => {
 
 // Create a new blog post.
 
-app.post('/posts', async (req, res) => {
+app.post('/posts', authenticate, async (req, res) => {
 
   const post = new Post(req.body);
 
-  post.user_id = '65f9b0c3da893c266cd903b1'; // TODO: use the current user's user ID.
-
-  console.log(post);
+  post.user_id = req.cse312.user._id;
 
   await post.save();
 
@@ -53,7 +52,7 @@ app.get('/posts/:id/comments', async (req, res) => {
 // Create a comment on a particular blog post.
 // TODO: sanitization.
 
-app.post('/posts/:id/comments', async (req, res) => {
+app.post('/posts/:id/comments', authenticate, async (req, res) => {
 
   // Verify that the blog post actually exists.
 
@@ -71,7 +70,7 @@ app.post('/posts/:id/comments', async (req, res) => {
 
     console.log(error);
 
-    return res.sendStatus(500); // TODO: check if BSON error then 404?
+    return res.sendStatus(500); // TODO: check if specifically a BSON error then 404?
   }
 
   // Create the comment.
@@ -79,7 +78,7 @@ app.post('/posts/:id/comments', async (req, res) => {
   const comment = new Comment(req.body);
 
   comment.post_id = req.params.id;
-  comment.user_id = '65f9b0c3da893c266cd903b1'; // TODO: use the current user's user ID.
+  comment.user_id = req.cse312.user._id;
 
   await comment.save();
 
@@ -101,7 +100,7 @@ app.get('/comments/:id', async (req, res) => {
 
 // Report a comment.
 
-app.post('/comments/:id/report', async (req, res) => {
+app.post('/comments/:id/report', authenticate, async (req, res) => {
 
   // Verify that the comment actually exists.
 
@@ -126,7 +125,7 @@ app.post('/comments/:id/report', async (req, res) => {
 
   // Create the report.
 
-  req.body.reporter = '65f9b0c3da893c266cd903b1'; // TODO: use the current user's user ID.
+  req.body.reporter = req.cse312.user._id;
 
   const report = new Report(req.body);
 
