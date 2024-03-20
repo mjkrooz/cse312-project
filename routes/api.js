@@ -169,12 +169,14 @@ app.get('/seed', async (req, res) => {
     "user_id": user1._id,
     "title": "I am in a waterfall",
     "content": "Long Form Content 1",
+    "banner": "https://photos.smugmug.com/Years/2022/220184-Nursing-International-Nursing-Day-Niagara-Falls-NY/i-gjQr4ND/0/C5FR2PG3L5rjptXftTvcHw55ncQtGB8CfLnP2KPKF/X3/CC2A3273-X3.jpg",
     "blurb": "lorem ipsum dolar blah blah blah blah blah blah blah"
   });
   const post2 = new Post({
     "user_id": user1._id,
     "title": "I am in a creek",
     "content": "Long Form Content 2",
+    "banner": "https://photos.smugmug.com/Years/2023/230354-CAS-Bio-Corey-Krabbenhoft-Mussels-Ellicott-Creek/i-GQpVzCc/0/C9BxhNVntsRnqnSjj5JgFCtJ9xsjrCMqcthrBMpxD/X3/IMG_6768-X3.jpg",
     "blurb": "lorem ipsum dolar blah blah blah blah blah blah blah"
   });
 
