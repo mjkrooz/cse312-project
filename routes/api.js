@@ -144,4 +144,78 @@ app.get('/users/:id', async (req, res) => {
   res.send(user);
 });
 
+// Seed the database.
+
+app.get('/seed', async (req, res) => {
+
+  // Seed users.
+
+  const user1 = new User({
+    "username": "usera",
+    "passwordHash": "$2b$10$E78kb34I9fphZEBrOvgvau5rskXepffy/FwIKzhAd1Nyc0UPA4AHi" // Changeme1!
+  });
+  
+  const user2 = new User({
+    "username": "userb",
+    "passwordHash": "$2b$10$E78kb34I9fphZEBrOvgvau5rskXepffy/FwIKzhAd1Nyc0UPA4AHi" // Changeme1!
+  });
+
+  await user1.save();
+  await user2.save();
+
+  // Seed posts.
+
+  const post1 = new Post({
+    "user_id": user1._id,
+    "title": "I am in a waterfall",
+    "content": "Long Form Content 1",
+    "blurb": "lorem ipsum dolar blah blah blah blah blah blah blah"
+  });
+  const post2 = new Post({
+    "user_id": user1._id,
+    "title": "I am in a creek",
+    "content": "Long Form Content 2",
+    "blurb": "lorem ipsum dolar blah blah blah blah blah blah blah"
+  });
+
+  await post1.save();
+  await post2.save();
+
+  // Seed comments.
+
+  const comment1 = new Comment({
+    "user_id": user1._id,
+    "post_id": post1._id,
+    "comment": "This is a test"
+  });
+
+  const comment2 = new Comment({
+    "user_id": user2._id,
+    "post_id": post1._id,
+    "comment": "This is a second comment on post 1"
+  });
+
+  const comment3 = new Comment({
+    "user_id": user2._id,
+    "post_id": post1._id,
+    "comment": "Hello World"
+  });
+
+  await comment1.save();
+  await comment2.save();
+  await comment3.save();
+
+  // Seed reports.
+
+  const report1 = new Report({
+    "reporter": user1._id,
+    "report": "This comment is lame"
+  });
+
+  comment3.reports.push(report1);
+  comment3.save();
+
+  res.redirect('/');
+})
+
 module.exports = app;
