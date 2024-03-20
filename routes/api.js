@@ -7,14 +7,18 @@
  */
 
 const express = require('express');
+const validator = require('validator');
 const app = express.Router();
 const authenticate = require('../middleware/authenticate');
 const Post = require('../models/post');
 const { Comment, Report } = require('../models/comment');
 const User = require('../models/user');
 
-// Get all blog posts.
-
+/**
+ * GET /api/v1/posts
+ * 
+ * Get all blog posts.
+ */
 app.get('/posts', async (req, res) => {
 
   const posts = await Post.find({});
@@ -22,21 +26,34 @@ app.get('/posts', async (req, res) => {
   return res.send(posts);
 });
 
-// Create a new blog post.
-
+/**
+ * POST /api/v1/posts
+ * 
+ * Create a new blog post.
+ */
 app.post('/posts', authenticate, async (req, res) => {
 
-  const post = new Post(req.body);
+  // Create the post.
 
-  post.user_id = req.cse312.user._id;
+  const post = new Post({
+    user_id: req.cse312.user._id,
+    title: validator.escape(post.title),
+    content: validator.escape(post.content),
+    blurb: validator.escape(post.blurb)
+  });
+
+  // Save the post.
 
   await post.save();
 
   res.sendStatus(201); // TODO: return the post contents.
 });
 
-// Get all comments on a particuar blog post.
-
+/**
+ * GET /api/v1/posts/:id/comments
+ * 
+ * Get all comments on a particular blog post.
+ */
 app.get('/posts/:id/comments', async (req, res) => {
 
   const comments = await Comment.find({"post_id": req.params.id, "deleted": false});
@@ -44,9 +61,11 @@ app.get('/posts/:id/comments', async (req, res) => {
   res.send(comments);
 });
 
-// Create a comment on a particular blog post.
-// TODO: sanitization.
-
+/**
+ * POST /api/v1/posts/:id/comments
+ * 
+ * Create a comment on a particular blog post.
+ */
 app.post('/posts/:id/comments', authenticate, async (req, res) => {
 
   // Verify that the blog post actually exists.
@@ -59,8 +78,6 @@ app.post('/posts/:id/comments', authenticate, async (req, res) => {
   
       return res.status(404).send({error: "Blog post not found"});
     }
-
-    console.log(post);
   } catch (error) {
 
     console.log(error);
@@ -70,31 +87,36 @@ app.post('/posts/:id/comments', authenticate, async (req, res) => {
 
   // Create the comment.
 
-  const comment = new Comment(req.body);
+  const comment = new Comment({
+    post_id: req.params.id,
+    user_id: req.cse312.user._id,
+    comment: validator.escape(req.body.comment)
+  });
 
-  comment.post_id = req.params.id;
-  comment.user_id = req.cse312.user._id;
+  // Save the comment.
 
   await comment.save();
-
-  console.log(comment);
 
   res.sendStatus(201); // TODO: return the comment contents.
 });
 
-// Get a specific comment from its ID.
-
+/**
+ * GET /api/v1/comments/:id
+ * 
+ * Get a specific comment from its ID.
+ */
 app.get('/comments/:id', async (req, res) => {
 
   const comment = await Comment.findById(req.params.id);
 
-  console.log(comment);
-
   res.send(comment);
 })
 
-// Report a comment.
-
+/**
+ * POST /api/v1/comments/:id/report
+ * 
+ * Report a specific comment from its ID.
+ */
 app.post('/comments/:id/report', authenticate, async (req, res) => {
 
   // Verify that the comment actually exists.
@@ -109,8 +131,6 @@ app.post('/comments/:id/report', authenticate, async (req, res) => {
   
       return res.status(404).send({error: "Comment not found"});
     }
-
-    console.log(comment);
   } catch (error) {
 
     console.log(error);
@@ -120,21 +140,23 @@ app.post('/comments/:id/report', authenticate, async (req, res) => {
 
   // Create the report.
 
-  req.body.reporter = req.cse312.user._id;
+  const report = new Report({
+    reporter: req.cse312.user._id,
+    report: validator.escape(req.body.report)
+  });
 
-  const report = new Report(req.body);
-
-  // Attach the report to the comment and save it.
-
-  comment.reports.push(report);
+  // Save the report.
 
   await comment.save();
 
   res.sendStatus(201); // TODO: return the report contents.
 });
 
-// Get a user by their ID.
-
+/**
+ * GET /api/v1/users/:id
+ * 
+ * Get a user by their ID.
+ */
 app.get('/users/:id', async (req, res) => {
 
   const user = await User.findById(req.params.id).select('username');
@@ -144,8 +166,11 @@ app.get('/users/:id', async (req, res) => {
   res.send(user);
 });
 
-// Seed the database.
-
+/**
+ * GET /api/v1/seed
+ * 
+ * Seed the database with defauly dummy data.
+ */
 app.get('/seed', async (req, res) => {
 
   // Seed users.
