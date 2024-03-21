@@ -58,6 +58,11 @@ app.get('/posts/:id/comments', async (req, res) => {
 
   const comments = await Comment.find({"post_id": req.params.id, "deleted": false});
 
+  if (comments.length == 0) {
+
+    return res.sendStatus(404);
+  }
+
   res.send(comments);
 });
 
@@ -108,6 +113,11 @@ app.post('/posts/:id/comments', authenticate, async (req, res) => {
 app.get('/comments/:id', async (req, res) => {
 
   const comment = await Comment.findById(req.params.id);
+
+  if (comment == null) {
+
+    return res.sendStatus(404);
+  }
 
   res.send(comment);
 })
@@ -160,6 +170,11 @@ app.post('/comments/:id/report', authenticate, async (req, res) => {
 app.get('/users/:id', async (req, res) => {
 
   const user = await User.findById(req.params.id).select('username');
+
+  if (user == null) {
+
+    return res.sendStatus(404);
+  }
 
   res.send(user);
 });
