@@ -37,9 +37,9 @@ app.post('/posts', authenticate, async (req, res) => {
 
   const post = new Post({
     user_id: req.cse312.user._id,
-    title: validator.escape(post.title),
-    content: validator.escape(post.content),
-    blurb: validator.escape(post.blurb)
+    title: validator.escape(req.body.title),
+    content: validator.escape(req.body.content),
+    blurb: validator.escape(req.body.blurb)
   });
 
   // Save the post.
@@ -160,8 +160,6 @@ app.post('/comments/:id/report', authenticate, async (req, res) => {
 app.get('/users/:id', async (req, res) => {
 
   const user = await User.findById(req.params.id).select('username');
-
-  console.log(user);
 
   res.send(user);
 });
