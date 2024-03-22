@@ -4,6 +4,7 @@ const app = express();
 const port = 8080;
 const bodyParser = require('body-parser');
 const {validatePassword} = require('./utils/validate_credentials')
+const {sanitize_html} = require('./utils/escape_html')
 const bcrypt = require('bcrypt')
 const mongoose = require('mongoose')
 const User = require('./models/user')
@@ -70,6 +71,9 @@ app.post('/register',async (req,res)=>{
       return res.status(401).json({error:'Username taken'})
 
     }
+
+    username = sanitize_html(username)
+
     const salt = await bcrypt.genSalt()
   
     password = password+salt
