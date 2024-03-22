@@ -63,7 +63,13 @@ app.post('/register',async (req,res)=>{
     {
       return res.status(401).json({error:'Password too weak, registration failed.'})
     }
-  
+    
+    userExists = await User.exists({username})
+
+    if(userExists){
+      return res.status(401).json({error:'Username taken'})
+
+    }
     const salt = await bcrypt.genSalt()
   
     password = password+salt
