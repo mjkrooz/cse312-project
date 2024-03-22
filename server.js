@@ -1,4 +1,5 @@
 const express = require('express')
+const path = require('path')
 const app = express();
 const port = 8080;
 const bodyParser = require('body-parser');
@@ -19,20 +20,31 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/src/public/index.html');
 });
 
+
+
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.post('/registration-form', (req, res) => {
-  res.sendFile(__dirname + '/src/public/registration.html');
-});
 
+//root endpoint
 app.get('/', (req, res) => {
 
   res.sendFile(__dirname + '/src/public/index.html');
 });
 
-app.get('/function.js',(req,res)=>{
-  res.sendFile(__dirname+'/src/public/function.js')
-})
+//endpoint to serve all public files
+app.get('/public/:filename', (req, res) => {
+  const filename = req.params.filename;
+  const filePath = path.join(__dirname, 'src', 'public', filename);
+
+  // Send the file to the client
+  res.sendFile(filePath, (err) => {
+      if (err) {
+          // If an error occurs, log it and send a 404 response
+          console.error(err);
+          res.status(404).send('File not found');
+      }
+  });
+});
 
 app.post('/register',async (req,res)=>{
 
