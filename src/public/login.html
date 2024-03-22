@@ -24,5 +24,19 @@
             </div>
         </form>
     </div>
+    <script>
+      async function login() {
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+
+    try {
+        const response = await axios.post('/login', { username, password });
+        
+        console.log('Login:', response.data.message);
+    } catch (error) {
+        console.error('Login Error:', error);
+    }
+}  
+    </script>
 </body>
 </html>
