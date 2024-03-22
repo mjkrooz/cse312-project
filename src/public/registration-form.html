@@ -4,23 +4,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registration Form</title>
+    <style>
+        .success {
+            color: green;
+            border-color: green;
+            margin-top: 20px;
+            padding: 10px;
+            border: 2px solid;
+            border-radius: 5px;
+            width: fit-content;
+        }
+
+        .error {
+            color: red;
+            border-color: red;
+            margin-top: 20px;
+            padding: 10px;
+            border: 2px solid;
+            border-radius: 5px;
+            width: fit-content;
+        }
+    </style>
 </head>
 <body>
+    <div class="server-response"></div>
     <h2>Registration Form</h2>
     <form id="registration-form">
         <label for="reg-form-username">Username:</label>
-        <input type="text" id="reg-form-username" name="username"><br><br>
+        <input type="text" id="reg-form-username" name="username" required><br><br>
         
         <label for="reg-form-password">Password:</label>
-        <input type="password" id="reg-form-password" name="password"><br><br>
+        <input type="password" id="reg-form-password" name="password" required><br><br>
         
         <label for="reg-form-pass-confirm">Confirm Password:</label>
-        <input type="password" id="reg-form-pass-confirm" name="password_confirm"><br><br>
+        <input type="password" id="reg-form-pass-confirm" name="password_confirm" required><br><br>
         
         <button type="button" onclick="register_account()">Register Account</button>
     </form>
 
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js" ></script>
     <script>
         async function register_account() {
             const username = document.getElementById('reg-form-username').value;
@@ -33,26 +55,44 @@
                 password_confirm: password_confirm
             };
             
-         
-
             try {
-                const response = await axios.post('/register', userinfo);
-                console.log(response.status); // Assuming you want to log the response data
-                console.log(response.data.success)
-
-               
-               
+                const response = await axios.post('/register', userinfo);                
+                const serverResponseDiv = document.querySelector('.server-response');
+                serverResponseDiv.textContent = response.data.success;
+                serverResponseDiv.classList.remove('error');
+                serverResponseDiv.classList.add('success');
 
             } catch (error) {
                 if(error.response){
-                erorrmsg = error.response.data.error
-                console.log(erorrmsg)
+                    const errmsg = error.response.data.error;
+                    console.log(errmsg);
+                    const serverResponseDiv = document.querySelector('.server-response');
+                    serverResponseDiv.textContent = errmsg;
+                    serverResponseDiv.classList.remove('success');
+                    serverResponseDiv.classList.add('error');
                 }
-                
             }
-            window.location.href = '/'
+
+            redirectCount()
 
         }
+
+        const redirectCount = () =>{
+            const serverResponseDiv = document.querySelector('.server-response');
+            var count = 3;
+            var timer = setInterval(() => {
+                serverResponseDiv.textContent = `Redirecting in ${count} seconds ...`
+                count--;
+                if(count == 0) {
+                    clearInterval(timer)
+                    window.location.href = '/'
+                }
+            }, 1000);
+        }
+
+ 
+
+        
     </script>
 </body>
 </html>
