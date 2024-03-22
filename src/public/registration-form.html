@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Form</title>
+</head>
+<body>
+    <h2>Registration Form</h2>
+    <form id="registration-form">
+        <label for="reg-form-username">Username:</label>
+        <input type="text" id="reg-form-username" name="username"><br><br>
+        
+        <label for="reg-form-password">Password:</label>
+        <input type="password" id="reg-form-password" name="password"><br><br>
+        
+        <label for="reg-form-pass-confirm">Confirm Password:</label>
+        <input type="password" id="reg-form-pass-confirm" name="password_confirm"><br><br>
+        
+        <button type="button" onclick="register_account()">Register Account</button>
+    </form>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        async function register_account() {
+            const username = document.getElementById('reg-form-username').value;
+            const password = document.getElementById('reg-form-password').value;
+            const password_confirm = document.getElementById('reg-form-pass-confirm').value;
+
+            const userinfo = {
+                username: username,
+                password: password,
+                password_confirm: password_confirm
+            };
+            
+         
+
+            try {
+                const response = await axios.post('/register', userinfo);
+                console.log(response.status); // Assuming you want to log the response data
+                console.log(response.data.success)
+
+               
+               
+
+            } catch (error) {
+                if(error.response){
+                erorrmsg = error.response.data.error
+                console.log(erorrmsg)
+                }
+                
+            }
+            window.location.href = '/'
+
+        }
+    </script>
+</body>
+</html>

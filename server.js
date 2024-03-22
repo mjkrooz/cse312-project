@@ -23,6 +23,8 @@ app.get('/', (req, res) => {
 
 
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
 
 
 //root endpoint
@@ -48,35 +50,37 @@ app.get('/public/:filename', (req, res) => {
 
 app.post('/register',async (req,res)=>{
 
-  const body = req.body
+    var {username,password,password_confirm} = req.body
 
-  username = body.username
-  password = body.password
 
-  if(!validatePassword(password))
-  {
-    res.status(401).json({error:'Password too weak, registration failed.'})
-  }
-
-  const salt = await bcrypt.genSalt()
-
-  password = password+salt
-
-  password_hash = await bcrypt.hash(password,salt)
-
-  //construct new user using our User mongo model
-  const user = new User(
+    if(password != password_confirm)
     {
-      username,
-      password_hash
+      return res.status(401).json({ error: 'Passwords do not match'});
+      
     }
-  )
-    user_save = await user.save()
 
-    console.log(user_save)
-   // user = await user.save() //save user to our collection
-
-    res.status(302).redirect('/')
+    if(!validatePassword(password))
+    {
+      return res.status(401).json({error:'Password too weak, registration failed.'})
+    }
+  
+    const salt = await bcrypt.genSalt()
+  
+    password = password+salt
+  
+    password_hash = await bcrypt.hash(password,salt)
+  
+    //construct new user using our User mongo model
+    const user = new User(
+      {
+        username,
+        password_hash,
+        salt
+      }
+    )
+     await user.save()
+  
+     return res.status(201).json({success: 'Account registered sucessfully.'})
 
 })
 
