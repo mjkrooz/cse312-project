@@ -75,15 +75,15 @@ app.post('/register',async (req,res)=>{
     }
     const salt = await bcrypt.genSalt()
   
-    password = password+salt
-  
-    password_hash = await bcrypt.hash(password,salt)
+    // password = password+salt
+
+    passwordHash = await bcrypt.hash(password,salt)
   
     //construct new user using our User mongo model
     const user = new User(
       {
         username,
-        password_hash,
+        passwordHash,
         salt
       }
     )
@@ -101,19 +101,17 @@ app.post('/login', async (request, response) => {
     console.log('Username:', username);
     console.log('Password:', password);
 
-    const user = await User.findOne({ username });
+    const user = await User.findOne({username});
     console.log('User:', user);
 
-    if (!user) {
-      console.log('User not found');
-      return response.status(401).json({ error: 'Invalid username/password' });
-    }
+    const passwordMatch = user === null
+      ? false
+      : await bcrypt.compare(password, user.passwordHash);
 
-    const passwordMatch = await bcrypt.compare(password, user.passwordHash);
     console.log('Password match:', passwordMatch);
 
-    if (!passwordMatch) {
-      console.log('Password does not match');
+    if (!user || !passwordMatch) {
+      console.log('Invalid username/password');
       return response.status(401).json({ error: 'Invalid username/password' });
     }
 
@@ -131,6 +129,7 @@ app.post('/login', async (request, response) => {
     response.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 
 
