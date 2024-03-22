@@ -4,18 +4,12 @@ const port = 8080;
 const bodyParser = require('body-parser');
 const {validatePassword} = require('./utils/validate_credentials')
 const bcrypt = require('bcrypt')
-const User = require('./models/user')
 const mongoose = require('mongoose')
+const User = require('./models/user')
 
-mongoose.set('strictQuery',false)
-mongoose.connect('mongodb://mongodb:27018/blogs').then(()=>{
-  console.log('Connected to db')
-})
-.catch(error=>{
-  console.log("Failed to connect to db")
-})
 app.use(function(req, res, next) {
 
+  mongoose.connect('mongodb://db:27017/cse312');
   res.append('X-Content-Type-Options', 'nosniff');
   next();
 });
@@ -71,6 +65,12 @@ app.post('/register',async (req,res)=>{
     res.status(302).redirect('/').json(user)
 
 })
+
+// Register API routes. All endpoints parse the body as JSON.
+
+const apiRoutes = require('./routes/api')
+app.use('/api/v1', express.json(), apiRoutes);
+
 // Register `src/public` for remaining static routes.
 
 app.use(express.static('src/public'));
