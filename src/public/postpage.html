@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Media Posts</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Create a new Post!</h1>
+        <form id="post-form">
+
+            <label for="title">Title: </label> 
+            <input type="text" id="title" name="title" required><br><br>
+
+            <label for="banner">Banner: </label> 
+            <input type="text" id="banner" name="banner" required><br><br>
+
+            <label for="content">Content: </label>
+            <input type="text" id="content" name="content" required> <br><br>
+
+            <label for="blurb">Blurb: </label>
+            <input type="text" id="blurb" name="blurb" required> <br><br>
+
+            <button type="submit">Send Post</button>
+            
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('post-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const DATA = {
+                title: document.getElementById("title").value,
+                banner: document.getElementById("banner").value,
+                content: document.getElementById("content").value,
+                blurb: document.getElementById("blurb").value
+            }
+
+            fetch('/api/v1/posts/',{
+                method:'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(DATA)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('RESPONSE NOT OK');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Success', data);
+                alert('POST CREATED!')
+            })
+            .catch(error =>{
+                console.error('Error', error);
+                alert('There was an error, try again')
+            });
+        });
+    </script>
+</body>
+</html>
