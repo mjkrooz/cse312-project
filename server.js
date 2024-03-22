@@ -7,8 +7,10 @@ const {validatePassword} = require('./utils/validate_credentials')
 const bcrypt = require('bcrypt')
 const mongoose = require('mongoose')
 const User = require('./models/user')
+const cookieParser = require('cookie-parser')
+const appVars = require('./middleware/appVars')
 
-app.use(function(req, res, next) {
+app.use(cookieParser(), appVars, function(req, res, next) {
 
   mongoose.connect('mongodb://db:27017/cse312');
   res.append('X-Content-Type-Options', 'nosniff');
