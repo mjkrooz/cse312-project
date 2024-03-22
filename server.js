@@ -2,10 +2,18 @@ const express = require('express')
 const app = express();
 const port = 8080;
 const bodyParser = require('body-parser');
-const {validatePassword} = require('./util/validate_credentials')
+const {validatePassword} = require('./utils/validate_credentials')
 const bcrypt = require('bcrypt')
 const User = require('./models/user')
+const mongoose = require('mongoose')
 
+mongoose.set('strictQuery',false)
+mongoose.connect('mongodb://mongodb:27018').then(()=>{
+  console.log('Connected to db')
+})
+.catch(error=>{
+  console.log("Failed to connect to db")
+})
 app.use(function(req, res, next) {
 
   res.append('X-Content-Type-Options', 'nosniff');
@@ -19,10 +27,8 @@ app.get('/', (req, res) => {
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.get('/registration-form', (req, res) => {
-
+app.post('/registration-form', (req, res) => {
   res.sendFile(__dirname + '/src/public/registration.html');
-
 });
 
 app.get('/', (req, res) => {
@@ -59,13 +65,10 @@ app.post('/register',async (req,res)=>{
       password_hash
     }
   )
-
+    user = await user.save()
    // user = await user.save() //save user to our collection
 
-    res.status(302).redirect('/')
-
-    
-  
+    res.status(302).redirect('/').json(user)
 
 })
 // Register `src/public` for remaining static routes.
