@@ -38,6 +38,7 @@ app.post('/posts', authenticate, async (req, res) => {
   const post = new Post({
     user_id: req.cse312.user._id,
     title: validator.escape(req.body.title),
+    banner: 'title' in req.body ? validator.escape(req.body.title) : '',
     content: validator.escape(req.body.content),
     blurb: validator.escape(req.body.blurb)
   });
@@ -46,7 +47,16 @@ app.post('/posts', authenticate, async (req, res) => {
 
   await post.save();
 
-  res.sendStatus(201); // TODO: return the post contents.
+  const output = {
+    _id: post._id,
+    user_id: post.user_id,
+    title: post.title,
+    banner: post.banner,
+    content: post.content,
+    blurb: post.blurb
+  };
+
+  res.status(201).send(output);
 });
 
 /**

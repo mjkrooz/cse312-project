@@ -47,8 +47,10 @@
             })
             .then(response => {
                 if (!response.ok) {
+                    console.log('response not ok?');
                     throw new Error('RESPONSE NOT OK');
                 }
+                console.log('response ok');
                 return response.json();
             })
             .then(data => {
