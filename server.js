@@ -59,10 +59,12 @@ app.post('/register',async (req,res)=>{
       password_hash
     }
   )
-    user = await user.save()
+    user_save = await user.save()
+
+    console.log(user_save)
    // user = await user.save() //save user to our collection
 
-    res.status(302).redirect('/').json(user)
+    res.status(302).redirect('/')
 
 })
 
