@@ -8,7 +8,7 @@ const User = require('./models/user')
 const mongoose = require('mongoose')
 
 mongoose.set('strictQuery',false)
-mongoose.connect('mongodb://mongodb:27018').then(()=>{
+mongoose.connect('mongodb://mongodb:27018/blogs').then(()=>{
   console.log('Connected to db')
 })
 .catch(error=>{
