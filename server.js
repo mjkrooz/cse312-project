@@ -36,8 +36,12 @@ app.get('/', (req, res) => {
 
 //endpoint to serve all public files
 app.get('/public/:filename', (req, res) => {
+
   const filename = req.params.filename;
-  const filePath = path.join(__dirname, 'src', 'public', filename);
+  
+  console.log(filename)
+
+  const filePath = path.join(__dirname, 'src', 'public',filename);
 
   // Send the file to the client
   res.sendFile(filePath, (err) => {
@@ -49,6 +53,17 @@ app.get('/public/:filename', (req, res) => {
   });
 });
 
+app.get('/public/image/:filename',(req,res)=>{
+  const filePath = path.join(__dirname, 'src', 'public','image',filename);
+
+  res.send(filePath,(err)=>{
+    if(err){
+      console.error(errr)
+      res.tatus(404).send('Image not found');
+    }
+  })
+
+});
 app.post('/register',async (req,res)=>{
 
     var {username,password,password_confirm} = req.body
