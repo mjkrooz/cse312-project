@@ -122,7 +122,7 @@ app.post('/login', async (req, res) => {
       user.sessionToken = hashedToken;
       await user.save();
 
-      res.cookie('sessionToken', sessionToken, { httpOnly: true });
+      res.cookie('sessionToken', sessionToken, { httpOnly: true, maxAge: 3600000 });
       console.log('Session token:', sessionToken);
       console.log('Login successful');
       res.status(200).json({ message: 'Login successful' });
