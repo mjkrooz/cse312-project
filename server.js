@@ -221,7 +221,8 @@ app.post('/login', async (req, res) => {
       res.cookie('sessionToken', sessionToken, { httpOnly: true, maxAge: 3600000 });
       console.log('Session token:', sessionToken);
       console.log('Login successful');
-      return res.status(302).redirect('/');
+      return res.redirect('/');
+
   } catch (error) {
       console.error('Login Error:', error);
       return res.status(500).json({ error: 'Internal server error' });
