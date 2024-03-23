@@ -16,6 +16,7 @@ const getUser = require('./middleware/getUser')
 const jwt = require('jsonwebtoken')
 require('dotenv').config()
 const handlebars = require('express-handlebars')
+const crypto = require('crypto');
 
 const handlebars_t = handlebars.create({
   helpers: {
@@ -187,43 +188,43 @@ app.post('/register',async (req,res)=>{
 
 })
 
-app.post('/login', async (request, response) => {
+app.post('/login', async (req, res) => {
+  const { username, password } = req.body;
+
   try {
-    console.log('Login request received');
-    
-    const { username, password } = request.body;
-    console.log('Username:', username);
-    console.log('Password:', password);
+      console.log('Login request received');
+      console.log('Username:', username);
+      console.log('Password:', password);
 
-    const user = await User.findOne({username});
-    console.log('User:', user);
+      const user = await User.findOne({ username });
+      console.log('User:', user);
+      if (!user) {
+          console.log('Invalid username/password');
+          return res.status(401).json({ error: 'Invalid username/password' });
+      }
 
-    const passwordMatch = user === null
-      ? false
-      : await bcrypt.compare(password, user.passwordHash);
+      const passwordMatch = await bcrypt.compare(password, user.passwordHash);
+      console.log('Password match:', passwordMatch);
+      if (!passwordMatch) {
+          console.log('Invalid username/password');
+          return res.status(401).json({ error: 'Invalid username/password' });
+      }
 
-    console.log('Password match:', passwordMatch);
+      const sessionToken = crypto.randomBytes(32).toString('hex');
 
-    if (!user || !passwordMatch) {
-      console.log('Invalid username/password');
-      return response.status(401).json({ error: 'Invalid username/password' });
-    }
+      const hashedToken = crypto.createHash('sha256').update(sessionToken).digest('hex');
+      user.sessionToken = hashedToken;
+      await user.save();
 
-    const personToken = {
-      username: user.username,
-      id: user._id
-    };
-
-    const token = jwt.sign(personToken, process.env.SECRET, { expiresIn: 3600 });
-    console.log('Token generated:', token);
-
-    response.status(201).send({ token, username: user.username, name: user.name });
+      res.cookie('sessionToken', sessionToken, { httpOnly: true, maxAge: 3600000 });
+      console.log('Session token:', sessionToken);
+      console.log('Login successful');
+      res.status(200).json({ message: 'Login successful' });
   } catch (error) {
-    console.error('Login Error:', error);
-    response.status(500).json({ error: 'Internal server error' });
+      console.error('Login Error:', error);
+      res.status(500).json({ error: 'Internal server error' });
   }
 });
-
 
 app.get('/logout', getUser, async (req, res) => {
 
@@ -237,8 +238,6 @@ app.get('/logout', getUser, async (req, res) => {
 
   res.redirect('/');
 })
-
-
 
 // Register API routes. All endpoints parse the body as JSON.
 
