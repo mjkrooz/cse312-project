@@ -43,6 +43,7 @@
 
             try {
                 const response = await axios.post('/login', { username, password });
+                window.location.href = '/'
 
             } catch (error) {
                 const errmsg = error.response.data.error || 'An error occurred.';
