@@ -10,6 +10,8 @@ const mongoose = require('mongoose')
 const User = require('./models/user')
 const cookieParser = require('cookie-parser')
 const appVars = require('./middleware/appVars')
+const jwt = require('jsonwebtoken')
+require('dotenv').config()
 
 app.use(cookieParser(), appVars, function(req, res, next) {
 
@@ -93,15 +95,15 @@ app.post('/register',async (req,res)=>{
 
     const salt = await bcrypt.genSalt()
   
-    password = password+salt
-  
-    password_hash = await bcrypt.hash(password,salt)
+    // password = password+salt
+
+    passwordHash = await bcrypt.hash(password,salt)
   
     //construct new user using our User mongo model
     const user = new User(
       {
         username,
-        password_hash,
+        passwordHash,
         salt
       }
     )
@@ -110,6 +112,47 @@ app.post('/register',async (req,res)=>{
      return res.status(201).json({success: 'Account registered sucessfully.'})
 
 })
+
+app.post('/login', async (request, response) => {
+  try {
+    console.log('Login request received');
+    
+    const { username, password } = request.body;
+    console.log('Username:', username);
+    console.log('Password:', password);
+
+    const user = await User.findOne({username});
+    console.log('User:', user);
+
+    const passwordMatch = user === null
+      ? false
+      : await bcrypt.compare(password, user.passwordHash);
+
+    console.log('Password match:', passwordMatch);
+
+    if (!user || !passwordMatch) {
+      console.log('Invalid username/password');
+      return response.status(401).json({ error: 'Invalid username/password' });
+    }
+
+    const personToken = {
+      username: user.username,
+      id: user._id
+    };
+
+    const token = jwt.sign(personToken, process.env.SECRET, { expiresIn: 3600 });
+    console.log('Token generated:', token);
+
+    response.status(201).send({ token, username: user.username, name: user.name });
+  } catch (error) {
+    console.error('Login Error:', error);
+    response.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+
+
 
 // Register API routes. All endpoints parse the body as JSON.
 
