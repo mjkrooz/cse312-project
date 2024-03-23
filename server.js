@@ -39,31 +39,33 @@ app.get('/public/:filename', (req, res) => {
 
   const filename = req.params.filename;
   
-  console.log(filename)
 
   const filePath = path.join(__dirname, 'src', 'public',filename);
 
-  // Send the file to the client
+  
   res.sendFile(filePath, (err) => {
       if (err) {
-          // If an error occurs, log it and send a 404 response
+         
           console.error(err);
-          res.status(404).send('File not found');
+          return res.status(404).send('File not found');
       }
   });
 });
 
-app.get('/public/image/:filename',(req,res)=>{
-  const filePath = path.join(__dirname, 'src', 'public','image',filename);
 
-  res.send(filePath,(err)=>{
-    if(err){
-      console.error(errr)
-      res.tatus(404).send('Image not found');
+app.get('/public/image/:filename', (req, res) => {
+  const filename = req.params.filename;
+  console.log(filename);
+  const filePath = path.join(__dirname, 'src', 'public', 'image', filename);
+  
+  res.sendFile(filePath, (err) => {
+    if (err) {
+      console.error(err);
+      res.status(404).send('Image not found');
     }
-  })
-
+  });
 });
+
 app.post('/register',async (req,res)=>{
 
     var {username,password,password_confirm} = req.body

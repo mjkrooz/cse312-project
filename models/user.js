@@ -8,7 +8,9 @@ const userSchema = new mongoose.Schema(
             minlength:3,
         },
 
-        passwordHash: String
+        passwordHash: String,
+
+        salt: String
     }
 )
 
