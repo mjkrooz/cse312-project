@@ -30,6 +30,24 @@ function addCommentToPost(postId) {
     });
 }
 
+function deleteComment(commentId) {
+
+    fetch('/api/v1/comments/' + commentId,{
+        method:'DELETE'
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('RESPONSE NOT OK');
+        }
+        alert('Comment deleted');
+        window.location = '/';
+    })
+    .catch(error =>{
+        console.error('Error', error);
+        alert('Failed to delete comment');
+    });
+}
+
 function addReportToComment(commentId) {
 
     const data = {};

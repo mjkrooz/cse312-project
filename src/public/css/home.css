@@ -84,3 +84,21 @@ body > .container {
 .form-group input[type="button"]:hover {
     background-color: #0056b3;
 }
+
+.form-group input[type="button"].delete {
+    background-color: #ff006a;
+    color: #fff;
+}
+
+.form-group input[type="button"].delete:hover {
+    background-color: #b3002d;
+}
+
+.form-group input[type="button"].create {
+    background-color: #2f8b13;
+    color: #fff;
+}
+
+.form-group input[type="button"].create:hover {
+    background-color: #2a7e11;
+}

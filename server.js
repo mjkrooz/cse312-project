@@ -15,9 +15,27 @@ const appVars = require('./middleware/appVars')
 const getUser = require('./middleware/getUser')
 const jwt = require('jsonwebtoken')
 require('dotenv').config()
-const { engine } = require('express-handlebars')
+const handlebars = require('express-handlebars')
 
-app.engine('handlebars', engine());
+const handlebars_t = handlebars.create({
+  helpers: {
+    objectIdEquals: function (a, b, options) {
+
+      if (a === null || b === null) {
+
+        return options.inverse(this);
+      }
+
+      if (a.equals(b)) {
+        return options.fn(this);
+      }
+
+      return options.inverse(this);
+    }
+  }
+});
+
+app.engine('handlebars', handlebars_t.engine);
 app.set('view engine', 'handlebars');
 app.set('views', './views');
 
@@ -37,6 +55,7 @@ app.get('/', getUser, async (req, res) => {
   res.render('home/index', {
     layout: false,
     username: req.cse312.user === null ? null : req.cse312.user.username,
+    user_id: req.cse312.user === null ? null : req.cse312.user._id,
     posts: (await Promise.all(posts.map(async (post) => {
 
       let raw = post.toJSON();

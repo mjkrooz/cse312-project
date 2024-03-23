@@ -11,7 +11,7 @@
         <div class="container form-group" style="text-align: center;">
 
             {{#if username}}
-                <p>Welcome, {{username}}!</p>
+                <p>Welcome, {{{username}}}!</p>
                 <input type="button" value="Logout" onclick="window.location.href='/logout';">
             {{else}}
                 <input type="button" value="Login" onclick="window.location.href='login.html';">
@@ -23,7 +23,7 @@
     
     {{#if username}}
         <div class="container form-group" style="text-align: center;">
-            <input type="button" value="Create Post" onclick="window.location.href='postpage.html';">
+            <input type="button" class="create" value="Create Post" onclick="window.location.href='postpage.html';">
         </div>
     {{/if}}
 
@@ -33,15 +33,15 @@
 
             {{#each posts}}
                 <div class="container post">
-                    <h2>{{this.title}}</h2>
-                    <p>{{this.blurb}}</p>
-                    <h3>By {{this.user.username}}</h3>
+                    <h2>{{{this.title}}}</h2>
+                    <p>{{{this.blurb}}}</p>
+                    <h3>By {{{this.user.username}}}</h3>
 
                     {{#if this.banner}}
                         <img src="{{this.banner}}">
                     {{/if}}
 
-                    <p>{{this.content}}</p>
+                    <p>{{{this.content}}}</p>
                     <h3>Comments</h3>
                     {{#if ../username}}
                         <div class="container">
@@ -55,7 +55,16 @@
                         {{#if this.comments}}
                         
                             {{#each this.comments}}
-                                <p style="border: 1px solid #AAA;padding: 5px;border-radius: 5px;"><b>{{this.user.username}}</b> commented: {{this.comment}}</p>
+                                <p style="border: 1px solid #AAA;padding: 5px;border-radius: 5px;"><b>{{{this.user.username}}}</b> commented: {{{this.comment}}}</p>
+                                
+                                {{#objectIdEquals ../../user_id this.user_id}}
+
+                                    <div class="form-group" style="text-align: center;">
+                                        <input type="button" class="delete" value="Delete Your Comment" onclick="deleteComment('{{this._id}}')">
+                                    </div>
+
+                                {{/objectIdEquals}}
+
                                 <div class="container" style="width: 30%;text-align: left;margin-top: 10px;">
 
                                     {{#if this.reports}}
@@ -63,7 +72,7 @@
 
                                         <ul>
                                             {{#each this.reports}}
-                                                <li><b>{{this.reporter.username}}</b>: {{this.report}}</li>
+                                                <li><b>{{{this.reporter.username}}}</b>: {{{this.report}}}</li>
                                             {{/each}}
                                         </ul>
                                     {{else}}
