@@ -4,6 +4,7 @@ const app = express();
 const port = 8080;
 const bodyParser = require('body-parser');
 const {validatePassword} = require('./utils/validate_credentials')
+const {sanitize_html} = require('./utils/escape_html')
 const bcrypt = require('bcrypt')
 const mongoose = require('mongoose')
 const User = require('./models/user')
@@ -37,8 +38,12 @@ app.get('/', (req, res) => {
 
 //endpoint to serve all public files
 app.get('/public/:filename', (req, res) => {
+
   const filename = req.params.filename;
-  const filePath = path.join(__dirname, 'src', 'public', filename);
+  
+  console.log(filename)
+
+  const filePath = path.join(__dirname, 'src', 'public',filename);
 
   // Send the file to the client
   res.sendFile(filePath, (err) => {
@@ -50,6 +55,17 @@ app.get('/public/:filename', (req, res) => {
   });
 });
 
+app.get('/public/image/:filename',(req,res)=>{
+  const filePath = path.join(__dirname, 'src', 'public','image',filename);
+
+  res.send(filePath,(err)=>{
+    if(err){
+      console.error(errr)
+      res.tatus(404).send('Image not found');
+    }
+  })
+
+});
 app.post('/register',async (req,res)=>{
 
     var {username,password,password_confirm} = req.body
@@ -72,6 +88,9 @@ app.post('/register',async (req,res)=>{
       return res.status(401).json({error:'Username taken'})
 
     }
+
+    username = sanitize_html(username)
+
     const salt = await bcrypt.genSalt()
   
     password = password+salt
