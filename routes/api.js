@@ -33,20 +33,38 @@ app.get('/posts', async (req, res) => {
  */
 app.post('/posts', authenticate, async (req, res) => {
 
-  // Create the post.
+  try {
 
-  const post = new Post({
-    user_id: req.cse312.user._id,
-    title: validator.escape(req.body.title),
-    content: validator.escape(req.body.content),
-    blurb: validator.escape(req.body.blurb)
-  });
+    // Create the post.
 
-  // Save the post.
+    const post = new Post({
+      user_id: req.cse312.user._id,
+      title: validator.escape(req.body.title),
+      banner: 'banner' in req.body ? req.body.banner : '',
+      content: validator.escape(req.body.content),
+      blurb: validator.escape(req.body.blurb)
+    });
 
-  await post.save();
+    // Save the post.
 
-  res.sendStatus(201); // TODO: return the post contents.
+    await post.save();
+
+    const output = {
+      _id: post._id,
+      user_id: post.user_id,
+      title: post.title,
+      banner: post.banner,
+      content: post.content,
+      blurb: post.blurb
+    };
+
+    res.status(201).send(output);
+  } catch (error) {
+
+    console.log(error);
+
+    res.sendStatus(500);
+  }
 });
 
 /**
@@ -83,26 +101,33 @@ app.post('/posts/:id/comments', authenticate, async (req, res) => {
   
       return res.status(404).send({error: "Blog post not found"});
     }
+
+    // Create the comment.
+  
+    const comment = new Comment({
+      post_id: req.params.id,
+      user_id: req.cse312.user._id,
+      comment: validator.escape(req.body.comment)
+    });
+  
+    // Save the comment.
+  
+    await comment.save();
+  
+    const output = {
+      _id: comment._id,
+      post_id: comment.post_id,
+      user_id: comment.user_id,
+      comment: comment.comment
+    };
+  
+    res.status(201).send(output);
   } catch (error) {
 
     console.log(error);
 
     return res.sendStatus(500); // TODO: check if specifically a BSON error then 404?
   }
-
-  // Create the comment.
-
-  const comment = new Comment({
-    post_id: req.params.id,
-    user_id: req.cse312.user._id,
-    comment: validator.escape(req.body.comment)
-  });
-
-  // Save the comment.
-
-  await comment.save();
-
-  res.sendStatus(201); // TODO: return the comment contents.
 });
 
 /**
@@ -119,8 +144,40 @@ app.get('/comments/:id', async (req, res) => {
     return res.sendStatus(404);
   }
 
-  res.send(comment);
+  const output = {
+    _id: comment._id,
+    post_id: comment.post_id,
+    user_id: comment.user_id,
+    comment: comment.comment
+  };
+
+  res.send(output);
 })
+
+/**
+ * DELETE /api/v1/posts/:id/comments
+ * 
+ * Delete a specific comment. Requires the writer of the comment to be the deleter.
+ */
+app.delete('/comments/:id', authenticate, async (req, res) => {
+
+  const comment = await Comment.findById(req.params.id);
+
+  if (comment == null) {
+
+    return res.sendStatus(404);
+  }
+
+  if (!comment.user_id.equals(req.cse312.user._id)) {
+
+    return res.sendStatus(403);
+  }
+
+  await Comment.deleteOne({'_id': req.params.id});
+
+  res.sendStatus(204);
+});
+
 
 /**
  * POST /api/v1/comments/:id/report
@@ -141,25 +198,33 @@ app.post('/comments/:id/report', authenticate, async (req, res) => {
   
       return res.status(404).send({error: "Comment not found"});
     }
+
+    // Create the report.
+  
+    const report = new Report({
+      reporter: req.cse312.user._id,
+      report: validator.escape(req.body.report)
+    });
+  
+    // Save the report.
+  
+    comment.reports.push(report);
+  
+    await comment.save();
+  
+    const output = {
+      _id: report._id,
+      reporter: report.reporter,
+      report: report.report
+    };
+  
+    res.status(201).send(output);
   } catch (error) {
 
     console.log(error);
 
     return res.sendStatus(500); // TODO: check if BSON error then 404?
   }
-
-  // Create the report.
-
-  const report = new Report({
-    reporter: req.cse312.user._id,
-    report: validator.escape(req.body.report)
-  });
-
-  // Save the report.
-
-  await comment.save();
-
-  res.sendStatus(201); // TODO: return the report contents.
 });
 
 /**
@@ -253,7 +318,7 @@ app.get('/seed', async (req, res) => {
   });
 
   comment3.reports.push(report1);
-  comment3.save();
+  await comment3.save();
 
   res.redirect('/');
 })

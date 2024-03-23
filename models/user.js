@@ -9,8 +9,13 @@ const userSchema = new mongoose.Schema(
         },
 
         passwordHash: String,
+        
+        salt: String,
 
-        salt: String
+        sessionToken: {
+            type: String,
+            default: ''
+        }
     }
 )
 
