@@ -283,7 +283,7 @@ app.get('/seed', async (req, res) => {
   });
 
   comment3.reports.push(report1);
-  comment3.save();
+  await comment3.save();
 
   res.redirect('/');
 })

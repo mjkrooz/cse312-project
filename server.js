@@ -8,11 +8,18 @@ const {sanitize_html} = require('./utils/escape_html')
 const bcrypt = require('bcrypt')
 const mongoose = require('mongoose')
 const User = require('./models/user')
+const Post = require('./models/post')
+const {Comment, Report} = require('./models/comment')
 const cookieParser = require('cookie-parser')
 const appVars = require('./middleware/appVars')
 const getUser = require('./middleware/getUser')
 const jwt = require('jsonwebtoken')
 require('dotenv').config()
+const { engine } = require('express-handlebars')
+
+app.engine('handlebars', engine());
+app.set('view engine', 'handlebars');
+app.set('views', './views');
 
 app.use(cookieParser(), appVars, function(req, res, next) {
 
@@ -21,15 +28,56 @@ app.use(cookieParser(), appVars, function(req, res, next) {
   next();
 });
 
-app.get('/', getUser, (req, res) => {
+app.get('/', getUser, async (req, res) => {
 
-  if (req.cse312.user === null) {
+  const posts = await Post.find({});
 
-    res.sendFile(__dirname + '/src/public/index_guest.html');
-  } else {
+  console.log(posts);
 
-    res.sendFile(__dirname + '/src/public/index_authed.html');
-  }
+  res.render('home/index', {
+    layout: false,
+    username: req.cse312.user === null ? null : req.cse312.user.username,
+    posts: await Promise.all(posts.map(async (post) => {
+
+      let raw = post.toJSON();
+      const comments = await Comment.find({'post_id': post._id});
+      const user = await User.findOne({'_id': post.user_id});
+
+
+      raw.comments = await Promise.all(comments.map(async (comment) => {
+
+        let raw = comment.toJSON();
+
+        const user = await User.findOne({'_id': comment.user_id}).select('username');
+        raw.user = user.toJSON();
+
+        const reports = await Promise.all(comment.reports.map(async (report) => {
+
+          raw = report.toJSON();
+
+          const user = await User.findOne({'_id': report.reporter}).select('username');
+          raw.reporter = user.toJSON();
+
+          return raw;
+        }));
+
+        raw.reports = reports;
+
+        return raw;
+      }));
+      raw.user = user.toJSON();
+
+      return raw;
+    }))
+  })
+
+  // if (req.cse312.user === null) {
+
+  //   res.sendFile(__dirname + '/src/public/index_guest.html');
+  // } else {
+
+  //   res.sendFile(__dirname + '/src/public/index_authed.html');
+  // }
 });
 
 
@@ -158,6 +206,18 @@ app.post('/login', async (request, response) => {
 });
 
 
+app.get('/logout', getUser, async (req, res) => {
+
+  if (req.cse312.user === null) {
+
+    return res.redirect('/'); 
+  }
+
+  req.cse312.user.token = '';
+  res.cookie('token', '', {maxAge: -3600 * 1000});
+
+  res.redirect('/');
+})
 
 
 
