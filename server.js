@@ -219,7 +219,7 @@ app.post('/login', async (req, res) => {
       res.cookie('sessionToken', sessionToken, { httpOnly: true, maxAge: 3600000 });
       console.log('Session token:', sessionToken);
       console.log('Login successful');
-      res.status(200).json({ message: 'Login successful' });
+      res.redirect('/');
   } catch (error) {
       console.error('Login Error:', error);
       res.status(500).json({ error: 'Internal server error' });
@@ -233,8 +233,9 @@ app.get('/logout', getUser, async (req, res) => {
     return res.redirect('/'); 
   }
 
-  req.cse312.user.token = '';
-  res.cookie('token', '', {maxAge: -3600 * 1000});
+  req.cse312.user.sessionToken = '';
+  await req.cse312.user.save();
+  res.cookie('sessionToken', '', {maxAge: -3600 * 1000});
 
   res.redirect('/');
 })

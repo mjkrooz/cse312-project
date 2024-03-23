@@ -8,7 +8,12 @@ const userSchema = new mongoose.Schema(
             minlength:3,
         },
 
-        passwordHash: String
+        passwordHash: String,
+
+        sessionToken: {
+            type: String,
+            default: ''
+        }
     }
 )
 
