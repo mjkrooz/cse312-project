@@ -10,6 +10,7 @@ const mongoose = require('mongoose')
 const User = require('./models/user')
 const cookieParser = require('cookie-parser')
 const appVars = require('./middleware/appVars')
+const getUser = require('./middleware/getUser')
 const jwt = require('jsonwebtoken')
 require('dotenv').config()
 
@@ -20,9 +21,15 @@ app.use(cookieParser(), appVars, function(req, res, next) {
   next();
 });
 
-app.get('/', (req, res) => {
+app.get('/', getUser, (req, res) => {
 
-  res.sendFile(__dirname + '/src/public/index.html');
+  if (req.cse312.user === null) {
+
+    res.sendFile(__dirname + '/src/public/index_guest.html');
+  } else {
+
+    res.sendFile(__dirname + '/src/public/index_authed.html');
+  }
 });
 
 
