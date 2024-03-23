@@ -10,6 +10,7 @@ const User = require('./models/user')
 const cookieParser = require('cookie-parser')
 const appVars = require('./middleware/appVars')
 const jwt = require('jsonwebtoken')
+require('dotenv').config()
 
 app.use(cookieParser(), appVars, function(req, res, next) {
 
