@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- <link rel="stylesheet" href="home.css"> -->
-    <title>Login Page</title>
+    <title>Travel Blog</title>
 
     <style>
         body {
@@ -97,10 +97,10 @@
 </head>
 <body>
     <div class="header">
-        <div class="form-group">
+        <div class="container form-group" style="text-align: center;">
 
             {{#if username}}
-                Welcome, {{username}}!
+                <p>Welcome, {{username}}!</p>
                 <input type="button" value="Logout" onclick="window.location.href='/logout';">
             {{else}}
                 <input type="button" value="Login" onclick="window.location.href='login.html';">
@@ -109,46 +109,75 @@
 
         </div>
     </div>
+    
+    {{#if username}}
+        <div class="container form-group" style="text-align: center;">
+            <input type="button" value="Create Post" onclick="window.location.href='postpage.html';">
+        </div>
+    {{/if}}
+
     <div class="post-container">
 
-        {{#each posts}}
-            <div class="container post">
-                <h2>{{this.title}}</h2>
-                <h3>By {{this.user.username}}</h3>
-                <img src="{{this.banner}}">
-                <p>{{this.blurb}}</p>
-                <h3>Comments</h3>
-                {{#if username}}
-                    <div class="container">
-                        <label for="addComment">Add comment:</label><br>
-                        <textarea name="addComment" id="addComment-{{this._id}}"></textarea><br>
-                        <input type="button" value="Comment" onclick="addCommentToPost('{{this._id}}');">
-                    </div>
-                {{/if}}
-			    <div class="container">
-                    
-                    {{#each this.comments}}
-                        <p><b>{{this.user.username}}</b>: {{this.comment}}</p>
-                        <div class="container" style="width: 30%;text-align: left;margin-top: 10px;">
-                            Reports:
+        {{#if posts}}
 
-                            <ul>
-                                {{#each this.reports}}
-                                    <li><b>{{this.reporter.username}}</b>: {{this.report}}</li>
-                                {{/each}}
-                            </ul>
-                            {{#if username}}
-                                <div>
-                                    <label for="reportComment">Add report:</label><br>
-                                    <textarea name="reportComment" id="reportComment-{{this._id}}"></textarea><br>
-                                    <input type="button" value="Report" onclick="addReportToComment('{{this._id}}');">
-                                </div>
-                            {{/if}}
+            {{#each posts}}
+                <div class="container post">
+                    <h2>{{this.title}}</h2>
+                    <p>{{this.blurb}}</p>
+                    <h3>By {{this.user.username}}</h3>
+
+                    {{#if this.banner}}
+                        <img src="{{this.banner}}">
+                    {{/if}}
+
+                    <p>{{this.content}}</p>
+                    <h3>Comments</h3>
+                    {{#if ../username}}
+                        <div class="container">
+                            <label for="addComment">Add comment:</label><br>
+                            <textarea name="addComment" id="addComment-{{this._id}}"></textarea><br>
+                            <input type="button" value="Comment" onclick="addCommentToPost('{{this._id}}');">
                         </div>
-                    {{/each}}
+                    {{/if}}
+                    <div class="container">
+
+                        {{#if this.comments}}
+                        
+                            {{#each this.comments}}
+                                <p style="border: 1px solid #AAA;padding: 5px;border-radius: 5px;"><b>{{this.user.username}}</b> commented: {{this.comment}}</p>
+                                <div class="container" style="width: 30%;text-align: left;margin-top: 10px;">
+
+                                    {{#if this.reports}}
+                                        Reports:
+
+                                        <ul>
+                                            {{#each this.reports}}
+                                                <li><b>{{this.reporter.username}}</b>: {{this.report}}</li>
+                                            {{/each}}
+                                        </ul>
+                                    {{else}}
+                                        <p><i>No reports for comment</i></p>
+                                    {{/if}}
+                                    {{#if ../../username}}
+                                        <div>
+                                            <label for="reportComment">Add report:</label><br>
+                                            <textarea name="reportComment" id="reportComment-{{this._id}}"></textarea><br>
+                                            <input type="button" value="Report" onclick="addReportToComment('{{this._id}}');">
+                                        </div>
+                                    {{/if}}
+                                </div>
+                            {{/each}}
+                        {{else}}
+                            <p><i>No comments on post</i></p>
+                        {{/if}}
+                    </div>
                 </div>
+            {{/each}}
+        {{else}}
+            <div class="container post">
+                <p><i>No blog posts exist</i></p>
             </div>
-        {{/each}}
+        {{/if}}
     </div>
 		
     <script>

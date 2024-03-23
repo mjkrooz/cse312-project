@@ -38,7 +38,7 @@ app.post('/posts', authenticate, async (req, res) => {
   const post = new Post({
     user_id: req.cse312.user._id,
     title: validator.escape(req.body.title),
-    banner: 'title' in req.body ? validator.escape(req.body.title) : '',
+    banner: 'banner' in req.body ? req.body.banner : '',
     content: validator.escape(req.body.content),
     blurb: validator.escape(req.body.blurb)
   });
@@ -180,6 +180,8 @@ app.post('/comments/:id/report', authenticate, async (req, res) => {
   });
 
   // Save the report.
+
+  comment.reports.push(report);
 
   await comment.save();
 

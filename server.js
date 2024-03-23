@@ -37,7 +37,7 @@ app.get('/', getUser, async (req, res) => {
   res.render('home/index', {
     layout: false,
     username: req.cse312.user === null ? null : req.cse312.user.username,
-    posts: await Promise.all(posts.map(async (post) => {
+    posts: (await Promise.all(posts.map(async (post) => {
 
       let raw = post.toJSON();
       const comments = await Comment.find({'post_id': post._id});
@@ -53,7 +53,7 @@ app.get('/', getUser, async (req, res) => {
 
         const reports = await Promise.all(comment.reports.map(async (report) => {
 
-          raw = report.toJSON();
+          let raw = report.toJSON();
 
           const user = await User.findOne({'_id': report.reporter}).select('username');
           raw.reporter = user.toJSON();
@@ -68,7 +68,7 @@ app.get('/', getUser, async (req, res) => {
       raw.user = user.toJSON();
 
       return raw;
-    }))
+    }))).reverse()
   })
 
   // if (req.cse312.user === null) {
