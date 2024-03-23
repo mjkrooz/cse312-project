@@ -112,7 +112,14 @@ app.post('/posts/:id/comments', authenticate, async (req, res) => {
 
   await comment.save();
 
-  res.sendStatus(201); // TODO: return the comment contents.
+  const output = {
+    _id: comment._id,
+    post_id: comment.post_id,
+    user_id: comment.user_id,
+    comment: comment.comment
+  };
+
+  res.status(201).send(output);
 });
 
 /**
@@ -129,7 +136,14 @@ app.get('/comments/:id', async (req, res) => {
     return res.sendStatus(404);
   }
 
-  res.send(comment);
+  const output = {
+    _id: comment._id,
+    post_id: comment.post_id,
+    user_id: comment.user_id,
+    comment: comment.comment
+  };
+
+  res.send(output);
 })
 
 /**
@@ -169,7 +183,13 @@ app.post('/comments/:id/report', authenticate, async (req, res) => {
 
   await comment.save();
 
-  res.sendStatus(201); // TODO: return the report contents.
+  const output = {
+    _id: report._id,
+    reporter: report.reporter,
+    report: report.report
+  };
+
+  res.status(201).send(output);
 });
 
 /**
