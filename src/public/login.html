@@ -9,7 +9,7 @@
 <body>
     <div class="container">
         <h2>Login</h2>
-        <form action="/login" method="post">
+        <form action="/login" method="post" onsubmit="login(event)">
             <div class="form-group">
                 <label for="username">Username:</label>
                 <input type="text" id="username" name="username" required>
@@ -18,25 +18,32 @@
                 <label for="password">Password:</label>
                 <input type="password" id="password" name="password" required>
             </div>
+            <div class="form-group" id="loginError">
+
+            </div>
             <div class="form-group">
                 <input type="submit" value="Login">
                 <input type="button" value="Create Account" onclick="window.location.href='registration-form.html';">
             </div>
         </form>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
-      async function login() {
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
+        async function login(event) {
 
-    try {
-        const response = await axios.post('/login', { username, password });
-        
-        console.log('Login:', response.data.message);
-    } catch (error) {
-        console.error('Login Error:', error);
-    }
-}  
+            event.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await axios.post('/login', { username, password });
+                
+                window.location = '/';
+            } catch (error) {
+                document.getElementById('loginError').innerHTML = error.response.data.error;
+            }
+        }
     </script>
 </body>
 </html>
