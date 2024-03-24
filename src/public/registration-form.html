@@ -76,6 +76,7 @@
                 serverResponseDiv.classList.remove('error');
                 serverResponseDiv.classList.add('success');
 
+                redirectCount()
             } catch (error) {
                 if(error.response){
                     const errmsg = error.response.data.error;
@@ -86,9 +87,6 @@
                     serverResponseDiv.classList.add('error');
                 }
             }
-
-            redirectCount()
-
         }
 
         const redirectCount = () =>{
