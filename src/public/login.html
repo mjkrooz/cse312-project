@@ -6,10 +6,22 @@
     <link rel="stylesheet" href="form.css">
     <title>Login Page</title>
 </head>
+<style>
+     .error {
+            color: red;
+            border-color: red;
+            margin-top: 20px;
+            padding: 10px;
+            border: 2px solid;
+            border-radius: 5px;
+            width: fit-content;
+        }
+</style>
 <body>
     <div class="container">
+        <div class="server-response"></div>
         <h2>Login</h2>
-        <form action="/login" method="post">
+        <form onsubmit="event.preventDefault(); login()">
             <div class="form-group">
                 <label for="username">Username:</label>
                 <input type="text" id="username" name="username" required>
@@ -23,19 +35,36 @@
             </div>
         </form>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
-      async function login() {
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
+        async function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
 
-    try {
-        const response = await axios.post('/login', { username, password });
-        
-        console.log('Login:', response.data.message);
-    } catch (error) {
-        console.error('Login Error:', error);
-    }
-}  
+            try {
+                const response = await axios.post('/login', { username, password });
+                console.log('Login:', response.data.message);
+            } catch (error) {
+                const errmsg = error.response.data.error || 'An error occurred.';
+                const serverResponseDiv = document.querySelector('.server-response');
+                serverResponseDiv.textContent = errmsg;
+                serverResponseDiv.classList.add('error');
+                redirectCount();
+            }
+        }
+
+        const redirectCount = () => {
+            const serverResponseDiv = document.querySelector('.server-response');
+            var count = 3;
+            var timer = setInterval(() => {
+                serverResponseDiv.textContent = `Redirecting in ${count} seconds ...`
+                count--;
+                if (count == 0) {
+                    clearInterval(timer)
+                    window.location.href = '/'
+                }
+            }, 1000);
+        }
     </script>
 </body>
 </html>
