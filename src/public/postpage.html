@@ -3,30 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="form.css">
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        
+    </style>
     <title>Social Media Posts</title>
 </head>
 <body>
 
-
-    
-    
     <div class="container">
         <h1>Create a new Post!</h1>
         <form id="post-form">
 
+            <div class="form-group">
             <label for="title">Title: </label> 
             <input type="text" id="title" name="title" required><br><br>
+            </div>
 
+
+            <div class="form-group">
             <label for="banner">Banner: </label> 
             <input type="text" id="banner" name="banner" required><br><br>
+            </div>
 
+            <div class="form-group">
             <label for="content">Content: </label>
             <input type="text" id="content" name="content" required> <br><br>
+            </div>
 
+            <div class="form-group">
             <label for="blurb">Blurb: </label>
             <input type="text" id="blurb" name="blurb" required> <br><br>
+            </div>
 
-            <button type="submit">Send Post</button>
+            <div class="form-group">
+            <input type="submit" value="Send Post">
+            </div>
             
         </form>
     </div>
