@@ -255,12 +255,12 @@ app.get('/seed', async (req, res) => {
 
   const user1 = new User({
     "username": "usera",
-    "passwordHash": "$2b$10$E78kb34I9fphZEBrOvgvau5rskXepffy/FwIKzhAd1Nyc0UPA4AHi" // Changeme1!
+    "passwordHash": "$2b$10$ofCWJhmH9BuhscVZQ6IlEeE.V6VXM3Dz7eU3qwCXK4r5cOBllJr.u" // Changeme1!
   });
   
   const user2 = new User({
     "username": "userb",
-    "passwordHash": "$2b$10$E78kb34I9fphZEBrOvgvau5rskXepffy/FwIKzhAd1Nyc0UPA4AHi" // Changeme1!
+    "passwordHash": "$2b$10$ofCWJhmH9BuhscVZQ6IlEeE.V6VXM3Dz7eU3qwCXK4r5cOBllJr.u" // Changeme1!
   });
 
   await user1.save();
