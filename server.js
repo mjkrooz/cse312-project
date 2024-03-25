@@ -16,7 +16,8 @@ const getUser = require('./middleware/getUser')
 require('dotenv').config()
 const handlebars = require('express-handlebars')
 const crypto = require('crypto');
-const {validateCSRF, generateCSRF} = require('./middleware/csrf')
+const {validateCSRF, generateCSRF} = require('./middleware/csrf');
+const authenticate = require('./middleware/authenticate');
 
 /**
  * Set up the Handlebars templating engine.
@@ -292,6 +293,21 @@ app.get('/logout', getUser, async (req, res) => {
 
   res.redirect('/');
 })
+
+/**
+ * GET /postpage.html
+ * 
+ * A form for creating a new post. Requires the user to be logged in.
+ */
+app.get('/postpage.html', authenticate, generateCSRF, async (req, res) => {
+
+  // Render the "posts/postpage" template.
+
+  res.render('posts/postpage', {
+    layout: false, // Prevent using a default layout, which causes an error.
+    csrf: req.cse312.user === null ? '' : req.cse312.user.csrfToken, // Set the CSRF token to that of the user's CSRF token, to be later validated.
+  })
+});
 
 /**
  * Register API routes. All endpoints parse the body as JSON.
