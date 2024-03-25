@@ -3,11 +3,13 @@ services:
   app:
     build:
       context: .
-      target: prod
+      target: dev
     ports:
       - '8080:8080'
     depends_on:
       - db
+    volumes:
+      - ./:/root
 
   db:
      image: mongo:7.0.0
