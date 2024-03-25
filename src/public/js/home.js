@@ -1,3 +1,8 @@
+
+window.onload = () => {
+    document.getElementById('js-placeholder').innerHTML = 'No blog posts exist';
+};
+
 function addCommentToPost(postId, csrfToken) {
 
     const data = {};
