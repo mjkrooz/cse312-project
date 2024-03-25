@@ -16,6 +16,7 @@ const getUser = require('./middleware/getUser')
 require('dotenv').config()
 const handlebars = require('express-handlebars')
 const crypto = require('crypto');
+const {validateCSRF, generateCSRF} = require('./middleware/csrf')
 
 /**
  * Set up the Handlebars templating engine.
@@ -73,7 +74,7 @@ app.use(cookieParser(), appVars, function(req, res, next) {
  * Uses the "getUser" middleware to set `req.cse312.user` to either a User object if
  * the user is authenticated, or to `null` if the user is not authenticated (AKA a guest).
  */
-app.get('/', getUser, async (req, res) => {
+app.get('/', getUser, generateCSRF, async (req, res) => {
 
   // Get all posts to display on the home page.
 
@@ -85,6 +86,7 @@ app.get('/', getUser, async (req, res) => {
     layout: false, // Prevent using a default layout, which causes an error.
     username: req.cse312.user === null ? null : req.cse312.user.username, // Set the username to nothing if a guest, or the username of the user.
     user_id: req.cse312.user === null ? null : req.cse312.user._id, // Set the user ID to nothing if a guest, or the ID of the user.
+    csrf: req.cse312.user === null ? '' : req.cse312.user.csrfToken, // Set the CSRF token to that of the user's CSRF token, to be later validated.
 
     // A sadly-complex JSON object to represent all posts, as well as the relevant comment, user, and report data for each.
     // This has to be in JSON due to Handlebars restrictions.

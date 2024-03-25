@@ -13,6 +13,7 @@ const authenticate = require('../middleware/authenticate');
 const Post = require('../models/post');
 const { Comment, Report } = require('../models/comment');
 const User = require('../models/user');
+const {validateCSRF} = require('../middleware/csrf');
 
 /**
  * GET /api/v1/posts
@@ -31,7 +32,7 @@ app.get('/posts', async (req, res) => {
  * 
  * Create a new blog post.
  */
-app.post('/posts', authenticate, async (req, res) => {
+app.post('/posts', authenticate, validateCSRF, async (req, res) => {
 
   try {
 
@@ -89,7 +90,7 @@ app.get('/posts/:id/comments', async (req, res) => {
  * 
  * Create a comment on a particular blog post.
  */
-app.post('/posts/:id/comments', authenticate, async (req, res) => {
+app.post('/posts/:id/comments', authenticate, validateCSRF, async (req, res) => {
 
   // Verify that the blog post actually exists.
 
@@ -159,7 +160,7 @@ app.get('/comments/:id', async (req, res) => {
  * 
  * Delete a specific comment. Requires the writer of the comment to be the deleter.
  */
-app.delete('/comments/:id', authenticate, async (req, res) => {
+app.delete('/comments/:id', authenticate, validateCSRF, async (req, res) => {
 
   const comment = await Comment.findById(req.params.id);
 
@@ -184,7 +185,7 @@ app.delete('/comments/:id', authenticate, async (req, res) => {
  * 
  * Report a specific comment from its ID.
  */
-app.post('/comments/:id/report', authenticate, async (req, res) => {
+app.post('/comments/:id/report', authenticate, validateCSRF, async (req, res) => {
 
   // Verify that the comment actually exists.
 
