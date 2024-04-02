@@ -1,3 +1,4 @@
+
 /**
  * 
  * 
@@ -14,7 +15,18 @@ const Post = require('../models/post');
 const { Comment, Report } = require('../models/comment');
 const User = require('../models/user');
 const {validateCSRF} = require('../middleware/csrf');
+const multer = require('multer')
+const path = require('path')
 
+const storage = multer.diskStorage({
+  destination: function (req,file,cb) {
+    cb(null, '../media')
+  },
+  filename: function (req,file,cb) {
+    cb(null,Date.now()+ path.extname(file.originalname))
+  }
+})
+const upload = multer({storage:storage})
 /**
  * GET /api/v1/posts
  * 
@@ -32,16 +44,18 @@ app.get('/posts', async (req, res) => {
  * 
  * Create a new blog post.
  */
-app.post('/posts', authenticate, validateCSRF, async (req, res) => {
+app.post('/posts', upload.single('banner'),authenticate, validateCSRF, async (req, res) => {
 
   try {
 
     // Create the post.
 
+    console.log(req.file.path)
+
     const post = new Post({
       user_id: req.cse312.user._id,
       title: validator.escape(req.body.title),
-      banner: 'banner' in req.body ? req.body.banner : '',
+      banner: req.file.path,
       content: validator.escape(req.body.content),
       blurb: validator.escape(req.body.blurb)
     });
@@ -324,4 +338,4 @@ app.get('/seed', async (req, res) => {
   res.redirect('/');
 })
 
-module.exports = app;
+module.exports = app
