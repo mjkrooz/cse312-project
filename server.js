@@ -322,6 +322,7 @@ app.use('/api/v1', express.json(), apiRoutes);
  */
 app.use(express.static('src/public'));
 
+
 /**
  * Start the server.
  */
