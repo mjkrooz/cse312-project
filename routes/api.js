@@ -20,10 +20,11 @@ const path = require('path')
 
 const storage = multer.diskStorage({
   destination: function (req,file,cb) {
-    cb(null, '../media')
+    media_path = path.join(__dirname,'../src/public/banner-uploads') //save the image to src/public/
+    cb(null,media_path)
   },
   filename: function (req,file,cb) {
-    cb(null,Date.now()+ path.extname(file.originalname))
+    cb(null,Date.now()+ path.extname(file.originalname)) //generate name for the file
   }
 })
 const upload = multer({storage:storage})
@@ -55,7 +56,7 @@ app.post('/posts', upload.single('banner'),authenticate, validateCSRF, async (re
     const post = new Post({
       user_id: req.cse312.user._id,
       title: validator.escape(req.body.title),
-      banner: req.file.path,
+      banner: `banner-uploads/${req.file.filename}`, //banner image will be served via app.use(static)
       content: validator.escape(req.body.content),
       blurb: validator.escape(req.body.blurb)
     });
