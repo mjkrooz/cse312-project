@@ -9,23 +9,35 @@ const bcrypt = require('bcrypt')
 const mongoose = require('mongoose')
 const User = require('./models/user')
 const Post = require('./models/post')
-const {Comment, Report} = require('./models/comment')
+const {Comment} = require('./models/comment')
 const cookieParser = require('cookie-parser')
 const appVars = require('./middleware/appVars')
 const getUser = require('./middleware/getUser')
-const jwt = require('jsonwebtoken')
 require('dotenv').config()
 const handlebars = require('express-handlebars')
 const crypto = require('crypto');
+const {validateCSRF, generateCSRF} = require('./middleware/csrf');
+const authenticate = require('./middleware/authenticate');
+
+/**
+ * Set up the Handlebars templating engine.
+ */
 
 const handlebars_t = handlebars.create({
   helpers: {
+
+    // A helper function to compare two ObjectIds within a template.
+
     objectIdEquals: function (a, b, options) {
+
+      // Skip if either are null.
 
       if (a === null || b === null) {
 
         return options.inverse(this);
       }
+
+      // Check equality.
 
       if (a.equals(b)) {
         return options.fn(this);
@@ -36,10 +48,18 @@ const handlebars_t = handlebars.create({
   }
 });
 
+// Register the engine.
+
 app.engine('handlebars', handlebars_t.engine);
 app.set('view engine', 'handlebars');
 app.set('views', './views');
 
+/**
+ * Set up default middleware, which applies to all routes.
+ * 
+ * This including connecting to the database as well as setting the
+ * X-Content-Type-Options header to "nosniff".
+ */
 app.use(cookieParser(), appVars, function(req, res, next) {
 
   mongoose.connect('mongodb://db:27017/cse312');
@@ -47,212 +67,266 @@ app.use(cookieParser(), appVars, function(req, res, next) {
   next();
 });
 
-app.get('/', getUser, async (req, res) => {
+/**
+ * GET /
+ * 
+ * The home page.
+ * 
+ * Uses the "getUser" middleware to set `req.cse312.user` to either a User object if
+ * the user is authenticated, or to `null` if the user is not authenticated (AKA a guest).
+ */
+app.get('/', getUser, generateCSRF, async (req, res) => {
+
+  // Get all posts to display on the home page.
 
   const posts = await Post.find({});
 
-  console.log(posts);
+  // Render the "home/index" template.
 
   res.render('home/index', {
-    layout: false,
-    username: req.cse312.user === null ? null : req.cse312.user.username,
-    user_id: req.cse312.user === null ? null : req.cse312.user._id,
+    layout: false, // Prevent using a default layout, which causes an error.
+    username: req.cse312.user === null ? null : req.cse312.user.username, // Set the username to nothing if a guest, or the username of the user.
+    user_id: req.cse312.user === null ? null : req.cse312.user._id, // Set the user ID to nothing if a guest, or the ID of the user.
+    csrf: req.cse312.user === null ? '' : req.cse312.user.csrfToken, // Set the CSRF token to that of the user's CSRF token, to be later validated.
+
+    // A sadly-complex JSON object to represent all posts, as well as the relevant comment, user, and report data for each.
+    // This has to be in JSON due to Handlebars restrictions.
+
     posts: (await Promise.all(posts.map(async (post) => {
 
+      // The following runs for each individual post.
+
+      // Convert this post to JSON.
+
       let raw = post.toJSON();
+
+      // Obtain all comments for this post, as well as the data of the user who made the post.
+
       const comments = await Comment.find({'post_id': post._id});
       const user = await User.findOne({'_id': post.user_id});
 
+      // Convert the comments to JSON, which requires another nested mapping to convert reports and user data.
 
-      raw.comments = await Promise.all(comments.map(async (comment) => {
+      raw.comments = await Promise.all(comments.map(async (comment) => { // The following runs for each comment on this post.
+
+        // Convert this comment to JSON.
 
         let raw = comment.toJSON();
+
+        // Obtain the data of the user who made the comment. Only need the username. Convert the user to JSON.
 
         const user = await User.findOne({'_id': comment.user_id}).select('username');
         raw.user = user.toJSON();
 
-        const reports = await Promise.all(comment.reports.map(async (report) => {
+        // Convert the reports on the comment to JSON, which requires another nested mapping to convert user data.
+
+        const reports = await Promise.all(comment.reports.map(async (report) => { // The following runs for each report on this comment.
+
+          // Convert this report to JSON.
 
           let raw = report.toJSON();
+
+          // Get the data of the user who made the report and convert it to JSON.
 
           const user = await User.findOne({'_id': report.reporter}).select('username');
           raw.reporter = user.toJSON();
 
+          // Return the now-JSON-ified report.
+
           return raw;
         }));
+
+        // Apply the reports to the comment and return the JSON-ified comment.
 
         raw.reports = reports;
 
         return raw;
       }));
+
+      // Apply the user to the post and return the finalized, JSON-ified post.
+
       raw.user = user.toJSON();
 
       return raw;
-    }))).reverse()
+    }))).reverse() // Reverse the list of posts so the most recent appears first.
   })
-
-  // if (req.cse312.user === null) {
-
-  //   res.sendFile(__dirname + '/src/public/index_guest.html');
-  // } else {
-
-  //   res.sendFile(__dirname + '/src/public/index_authed.html');
-  // }
 });
 
+// The remaining routes accept JSON as the request body format.
 
-
-app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-
-
-//root endpoint
-app.get('/', (req, res) => {
-
-  res.sendFile(__dirname + '/src/public/index.html');
-});
-
-//endpoint to serve all public files
-app.get('/public/:filename', (req, res) => {
-
-  const filename = req.params.filename;
-  
-
-  const filePath = path.join(__dirname, 'src', 'public',filename);
-
-  
-  res.sendFile(filePath, (err) => {
-      if (err) {
-         
-          console.error(err);
-          return res.status(404).send('File not found');
-      }
-  });
-});
-
-
-app.get('/public/image/:filename', (req, res) => {
-  const filename = req.params.filename;
-  console.log(filename);
-  const filePath = path.join(__dirname, 'src', 'public', 'image', filename);
-  
-  res.sendFile(filePath, (err) => {
-    if (err) {
-      console.error(err);
-      res.status(404).send('Image not found');
-    }
-  });
-});
-
+/**
+ * POST /register
+ * 
+ * Register an account. Note that viewing the form to register an account is covered later as a static route.
+ */
 app.post('/register',async (req,res)=>{
 
-    var {username,password,password_confirm} = req.body
+  // Get the submitted data from the request body.
 
+  var {username,password,password_confirm} = req.body
 
-    if(password != password_confirm)
-    {
-      return res.status(401).json({ error: 'Passwords do not match'});
-      
-    }
+  // Ensure that the passwords match.
 
-    if(!validatePassword(password))
-    {
-      return res.status(401).json({error:'Password too weak, registration failed.'})
-    }
+  if(password != password_confirm)
+  {
+    return res.status(401).json({ error: 'Passwords do not match'});
     
-    userExists = await User.exists({username})
+  }
 
-    if(userExists){
-      return res.status(401).json({error:'Username taken'})
+  // Ensure that the password is strong enough, using the same requirements from the homework.
 
+  if(!validatePassword(password))
+  {
+    return res.status(401).json({error:'Password too weak, registration failed.'})
+  }
+  
+  const userExists = await User.exists({username})
+
+  // Prevent registering with the same username as another user.
+
+  if(userExists){
+    return res.status(401).json({error:'Username taken'})
+
+  }
+
+  // Sanitize the username.
+
+  username = sanitize_html(username)
+
+  // Create a hash of the password.
+  // password = password+salt
+
+  const salt = await bcrypt.genSalt()
+  const passwordHash = await bcrypt.hash(password,salt)
+
+  // Construct new user using our User mongo model
+
+  const user = new User(
+    {
+      username,
+      passwordHash,
+      salt
     }
+  )
 
-    username = sanitize_html(username)
+  // Save the user and notify them that their account was created.
 
-    const salt = await bcrypt.genSalt()
-  
-    // password = password+salt
+  await user.save()
 
-    passwordHash = await bcrypt.hash(password,salt)
-  
-    //construct new user using our User mongo model
-    const user = new User(
-      {
-        username,
-        passwordHash,
-        salt
-      }
-    )
-     await user.save()
-  
-     return res.status(201).json({success: 'Account registered sucessfully.'})
-
+  return res.status(201).json({success: 'Account registered sucessfully.'})
 })
 
+/**
+ * POST /login
+ * 
+ * Logs a user in, including setting the `sessionToken` cookie.
+ */
 app.post('/login', async (req, res) => {
+
+  // Get the username and password from the submitted form, noting that it will appear as JSON.
+
   const { username, password } = req.body;
 
   try {
-      console.log('Login request received');
-      console.log('Username:', username);
-      console.log('Password:', password);
 
-      const user = await User.findOne({ username });
-      console.log('User:', user);
-      if (!user) {
-          console.log('Invalid username/password');
-          return res.status(401).json({ error: 'Invalid username/password' });
-      }
+    // If no user was found with the given username, login failed.
 
-      const passwordMatch = await bcrypt.compare(password, user.passwordHash);
-      console.log('Password match:', passwordMatch);
-      if (!passwordMatch) {
-          console.log('Invalid username/password');
-          return res.status(401).json({ error: 'Invalid username/password' });
-      }
+    const user = await User.findOne({ username });
+    
+    if (!user) {
+      
+      return res.status(401).json({ error: 'Invalid username/password' });
+    }
 
-      const sessionToken = crypto.randomBytes(32).toString('hex');
+    // Otherwise, attempt to compare the password with the stored hash of the password.
 
-      const hashedToken = crypto.createHash('sha256').update(sessionToken).digest('hex');
-      user.sessionToken = hashedToken;
-      await user.save();
+    const passwordMatch = await bcrypt.compare(password, user.passwordHash);
+
+    if (!passwordMatch) {
+      
+      return res.status(401).json({ error: 'Invalid username/password' });
+    }
+
+    // Passwords matched, generate a session token and a hashed version of the token.
+
+    const sessionToken = crypto.randomBytes(32).toString('hex');
+    const hashedToken = crypto.createHash('sha256').update(sessionToken).digest('hex');
+
+    // Apply the hashed token to the user in the database and save it.
+
+    user.sessionToken = hashedToken;
+    await user.save();
+
+    // Apply the non-hashed token as a cookie that expires in 1 hour and is HttpOnly.
 
       res.cookie('sessionToken', sessionToken, { httpOnly: true, maxAge: 3600000 });
       console.log('Session token:', sessionToken);
       console.log('Login successful');
-      return res.redirect('/');
-
+      res.redirect('/');
   } catch (error) {
       console.error('Login Error:', error);
-      return res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({ error: 'Internal server error' });
   }
 });
 
+/**
+ * GET /logout
+ * 
+ * Logs a user out.
+ */
 app.get('/logout', getUser, async (req, res) => {
 
-  if (req.cse312.user === null) {
+  // Ensure the user is not a guest first.
 
-    return res.redirect('/'); 
+  if (req.cse312.user !== null) {
+
+    // Empty the user's token in the database and save it.
+
+    req.cse312.user.sessionToken = '';
+    await req.cse312.user.save();
+
+    // Revoke the cookie by setting it to nothing and setting its expiration in the past.
+
+    res.cookie('sessionToken', '', {maxAge: -3600 * 1000});
   }
-
-  req.cse312.user.sessionToken = '';
-  await req.cse312.user.save();
-  res.cookie('sessionToken', '', {maxAge: -3600 * 1000});
 
   res.redirect('/');
 })
 
-// Register API routes. All endpoints parse the body as JSON.
+/**
+ * GET /postpage.html
+ * 
+ * A form for creating a new post. Requires the user to be logged in.
+ */
+app.get('/postpage.html', authenticate, generateCSRF, async (req, res) => {
 
+  // Render the "posts/postpage" template.
+
+  res.render('posts/postpage', {
+    layout: false, // Prevent using a default layout, which causes an error.
+    csrf: req.cse312.user === null ? '' : req.cse312.user.csrfToken, // Set the CSRF token to that of the user's CSRF token, to be later validated.
+  })
+});
+
+/**
+ * Register API routes. All endpoints parse the body as JSON.
+ */
 const apiRoutes = require('./routes/api')
 app.use('/api/v1', express.json(), apiRoutes);
 
-// Register `src/public` for remaining static routes.
-
+/**
+ * Register `src/public` for remaining static routes.
+ * This includes forms for logging in, registering, and creating a post, as well as images,
+ * CSS, and JavaScript.
+ */
 app.use(express.static('src/public'));
 
-// Start the server.
+
+/**
+ * Start the server.
+ */
 app.listen(port, () => {
   console.log('Listening on port: ' + port);
 });

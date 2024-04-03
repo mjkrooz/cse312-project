@@ -15,6 +15,11 @@ const userSchema = new mongoose.Schema(
         sessionToken: {
             type: String,
             default: ''
+        },
+
+        csrfToken: {
+            type: String,
+            default: ''
         }
     }
 )

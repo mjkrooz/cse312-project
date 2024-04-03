@@ -1,9 +1,15 @@
-function addCommentToPost(postId) {
+
+window.onload = () => {
+    document.getElementById('js-placeholder').innerHTML = 'No blog posts exist';
+};
+
+function addCommentToPost(postId, csrfToken) {
 
     const data = {};
     const comment = document.getElementById('addComment-' + postId);
 
     data.comment = comment.value;
+    data.csrfToken = csrfToken;
 
     fetch('/api/v1/posts/' + postId + '/comments',{
         method:'POST',
@@ -30,10 +36,18 @@ function addCommentToPost(postId) {
     });
 }
 
-function deleteComment(commentId) {
+function deleteComment(commentId, csrfToken) {
+
+    const data = {};
+
+    data.csrfToken = csrfToken;
 
     fetch('/api/v1/comments/' + commentId,{
-        method:'DELETE'
+        method:'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
     })
     .then(response => {
         if (!response.ok) {
@@ -48,12 +62,13 @@ function deleteComment(commentId) {
     });
 }
 
-function addReportToComment(commentId) {
+function addReportToComment(commentId, csrfToken) {
 
     const data = {};
     const report = document.getElementById('reportComment-' + commentId);
 
     data.report = report.value;
+    data.csrfToken = csrfToken;
 
     fetch('/api/v1/comments/' + commentId + '/report',{
         method:'POST',

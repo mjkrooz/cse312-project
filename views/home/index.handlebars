@@ -47,7 +47,7 @@
                         <div class="container">
                             <label for="addComment">Add comment:</label><br>
                             <textarea name="addComment" id="addComment-{{this._id}}"></textarea><br>
-                            <input type="button" value="Comment" onclick="addCommentToPost('{{this._id}}');">
+                            <input type="button" value="Comment" onclick="addCommentToPost('{{this._id}}', '{{../csrf}}');">
                         </div>
                     {{/if}}
                     <div class="container">
@@ -60,7 +60,7 @@
                                 {{#objectIdEquals ../../user_id this.user_id}}
 
                                     <div class="form-group" style="text-align: center;">
-                                        <input type="button" class="delete" value="Delete Your Comment" onclick="deleteComment('{{this._id}}')">
+                                        <input type="button" class="delete" value="Delete Your Comment" onclick="deleteComment('{{this._id}}', '{{../../csrf}}')">
                                     </div>
 
                                 {{/objectIdEquals}}
@@ -82,7 +82,7 @@
                                         <div>
                                             <label for="reportComment">Add report:</label><br>
                                             <textarea name="reportComment" id="reportComment-{{this._id}}"></textarea><br>
-                                            <input type="button" value="Report" onclick="addReportToComment('{{this._id}}');">
+                                            <input type="button" value="Report" onclick="addReportToComment('{{this._id}}', '{{../../csrf}}');">
                                         </div>
                                     {{/if}}
                                 </div>
@@ -95,7 +95,7 @@
             {{/each}}
         {{else}}
             <div class="container post">
-                <p><i>No blog posts exist</i></p>
+                <p><i id="js-placeholder"></i></p>
             </div>
         {{/if}}
     </div>

@@ -19,9 +19,8 @@
 </style>
 <body>
     <div class="container">
-        <div class="server-response"></div>
         <h2>Login</h2>
-        <form onsubmit="event.preventDefault(); login()">
+        <form action="/login" method="post">
             <div class="form-group">
                 <label for="username">Username:</label>
                 <input type="text" id="username" name="username" required>
@@ -30,6 +29,9 @@
                 <label for="password">Password:</label>
                 <input type="password" id="password" name="password" required>
             </div>
+            <div class="form-group" id="loginError">
+
+            </div>
             <div class="form-group">
                 <input type="submit" value="Login">
             </div>
@@ -37,35 +39,18 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
-        async function login() {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
+      async function login() {
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
 
-            try {
-                const response = await axios.post('/login', { username, password });
-                window.location.href = '/'
-
-            } catch (error) {
-                const errmsg = error.response.data.error || 'An error occurred.';
-                const serverResponseDiv = document.querySelector('.server-response');
-                serverResponseDiv.textContent = errmsg;
-                serverResponseDiv.classList.add('error');
-                redirectCount();
-            }
-        }
-
-        const redirectCount = () => {
-            const serverResponseDiv = document.querySelector('.server-response');
-            var count = 3;
-            var timer = setInterval(() => {
-                serverResponseDiv.textContent = `Redirecting in ${count} seconds ...`
-                count--;
-                if (count == 0) {
-                    clearInterval(timer)
-                    window.location.href = '/'
-                }
-            }, 1000);
-        }
+    try {
+        const response = await axios.post('/login', { username, password });
+        
+        console.log('Login:', response.data.message);
+    } catch (error) {
+        console.error('Login Error:', error);
+    }
+}  
     </script>
 </body>
 </html>

@@ -5,7 +5,7 @@ const crypto = require('crypto')
 
 async function getUser(req, res, next) {
 
-    // Get the user if 
+    // Get the user if the session cookie exists.
 
     if ('sessionToken' in req.cookies) {
 

@@ -1,3 +1,4 @@
+
 /**
  * 
  * 
@@ -13,7 +14,20 @@ const authenticate = require('../middleware/authenticate');
 const Post = require('../models/post');
 const { Comment, Report } = require('../models/comment');
 const User = require('../models/user');
+const {validateCSRF} = require('../middleware/csrf');
+const multer = require('multer')
+const path = require('path')
 
+const storage = multer.diskStorage({
+  destination: function (req,file,cb) {
+    media_path = path.join(__dirname,'../src/public/banner-uploads') //save the image to src/public/
+    cb(null,media_path)
+  },
+  filename: function (req,file,cb) {
+    cb(null,Date.now()+ path.extname(file.originalname)) //generate name for the file
+  }
+})
+const upload = multer({storage:storage})
 /**
  * GET /api/v1/posts
  * 
@@ -31,16 +45,18 @@ app.get('/posts', async (req, res) => {
  * 
  * Create a new blog post.
  */
-app.post('/posts', authenticate, async (req, res) => {
+app.post('/posts', upload.single('banner'),authenticate, validateCSRF, async (req, res) => {
 
   try {
 
     // Create the post.
 
+    console.log(req.file.path)
+
     const post = new Post({
       user_id: req.cse312.user._id,
       title: validator.escape(req.body.title),
-      banner: 'banner' in req.body ? req.body.banner : '',
+      banner: `banner-uploads/${req.file.filename}`, //banner image will be served via app.use(static)
       content: validator.escape(req.body.content),
       blurb: validator.escape(req.body.blurb)
     });
@@ -89,7 +105,7 @@ app.get('/posts/:id/comments', async (req, res) => {
  * 
  * Create a comment on a particular blog post.
  */
-app.post('/posts/:id/comments', authenticate, async (req, res) => {
+app.post('/posts/:id/comments', authenticate, validateCSRF, async (req, res) => {
 
   // Verify that the blog post actually exists.
 
@@ -159,7 +175,7 @@ app.get('/comments/:id', async (req, res) => {
  * 
  * Delete a specific comment. Requires the writer of the comment to be the deleter.
  */
-app.delete('/comments/:id', authenticate, async (req, res) => {
+app.delete('/comments/:id', authenticate, validateCSRF, async (req, res) => {
 
   const comment = await Comment.findById(req.params.id);
 
@@ -184,7 +200,7 @@ app.delete('/comments/:id', authenticate, async (req, res) => {
  * 
  * Report a specific comment from its ID.
  */
-app.post('/comments/:id/report', authenticate, async (req, res) => {
+app.post('/comments/:id/report', authenticate, validateCSRF, async (req, res) => {
 
   // Verify that the comment actually exists.
 
@@ -255,12 +271,12 @@ app.get('/seed', async (req, res) => {
 
   const user1 = new User({
     "username": "usera",
-    "passwordHash": "$2b$10$E78kb34I9fphZEBrOvgvau5rskXepffy/FwIKzhAd1Nyc0UPA4AHi" // Changeme1!
+    "passwordHash": "$2b$10$ofCWJhmH9BuhscVZQ6IlEeE.V6VXM3Dz7eU3qwCXK4r5cOBllJr.u" // Changeme1!
   });
   
   const user2 = new User({
     "username": "userb",
-    "passwordHash": "$2b$10$E78kb34I9fphZEBrOvgvau5rskXepffy/FwIKzhAd1Nyc0UPA4AHi" // Changeme1!
+    "passwordHash": "$2b$10$ofCWJhmH9BuhscVZQ6IlEeE.V6VXM3Dz7eU3qwCXK4r5cOBllJr.u" // Changeme1!
   });
 
   await user1.save();
@@ -323,4 +339,4 @@ app.get('/seed', async (req, res) => {
   res.redirect('/');
 })
 
-module.exports = app;
+module.exports = app
