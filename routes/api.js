@@ -45,7 +45,7 @@ app.get('/posts', async (req, res) => {
  * 
  * Create a new blog post.
  */
-app.post('/posts', upload.single('banner'),authenticate, validateCSRF, async (req, res) => {
+app.post('/posts', upload.single('banner'), authenticate, validateCSRF, async (req, res) => {
 
   try {
 
