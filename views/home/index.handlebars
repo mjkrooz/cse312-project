@@ -5,13 +5,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/css/home.css">
     <title>Travel Blog</title>
-</head>
 
-  <script src="/socket.io/socket.io.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
     <script>
-    const socket = io({transports: ['websocket']}); //prevents socket io from long polling
-    </script>
+        const socket = io({transports: ['websocket']}); //prevents socket io from long polling
 
+        socket.on('newComment', (comment) => {
+            console.log(comment);
+
+            // Get the container where the HTML for the comment is meant to go.
+
+            const commentsContainer = document.getElementById('comments-for-' + comment.post_id);
+
+            // Create a new comment HTML block.
+
+            let buffer = '<p style="border: 1px solid #AAA;padding: 5px;border-radius: 5px;"><b>'+comment.username+'</b> commented: '+comment.comment+'</p>';
+
+            if (comment.user_id === '{{user_id}}') {
+
+                buffer += '<div class="form-group" style="text-align: center;">';
+                buffer += '<input type="button" class="delete" value="Delete Your Comment" onclick="deleteComment(\''+comment._id+'\', \'{{csrf}}\',socket)">';
+                buffer += '</div>';
+            }
+
+            buffer += '<div class="container" style="width: 30%;text-align: left;margin-top: 10px;">';
+            buffer += 'Reports:';
+            buffer += '<p><i>No reports for comment</i></p>';
+
+            buffer += '<div>';
+            buffer += '<label for="reportComment">Add report:</label><br>';
+            buffer += '<textarea name="reportComment" id="reportComment-"'+comment._id+'></textarea><br>';
+            buffer += '<input type="button" value="Report" onclick="addReportToComment(\''+comment._id+'\', \'{{csrf}}\');">';
+            buffer += '</div>';
+
+            commentsContainer.innerHTML += buffer;
+        });
+    </script>
+</head>
 <body>
     <div class="header">
         <div class="container form-group" style="text-align: center;">

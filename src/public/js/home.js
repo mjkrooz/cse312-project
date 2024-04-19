@@ -1,8 +1,15 @@
 window.onload = () => {
     document.getElementById('js-placeholder').innerHTML = 'No blog posts exist';
+
+    const jsPlaceholder = document.getElementById('js-placeholder');
+
+    if (jsPlaceholder !== undefined && jsPlaceholder !== null) {
+
+        jsPlaceholder.innerHTML = 'No blog posts exist';
+    }
 };
 
-function addCommentToPost(postId, csrfToken,socket) {
+function addCommentToPost(postId, csrfToken, socket) {
 
     const data = {};
     const comment = document.getElementById('addComment-' + postId);
@@ -14,10 +21,10 @@ function addCommentToPost(postId, csrfToken,socket) {
     // Emit the comment. Elsewhere, the comment will be collected (by all clients) and displayed.
 
     socket.emit('comment', data)
-    
-    // Get the container where the HTML for the comment is meant to go.
 
-    const commentsContainer = document.getElementById('comments-for-' + postId);
+    // Empty the input box.
+
+    comment.value = '';
     
     // The following was used prior to the implementation of websockets.
 
@@ -46,7 +53,7 @@ function addCommentToPost(postId, csrfToken,socket) {
     });*/
 }
 
-function deleteComment(commentId, csrfToken) {
+function deleteComment(commentId, csrfToken, socket) {
 
     const data = {};
 
