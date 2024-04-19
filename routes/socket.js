@@ -38,6 +38,16 @@ const establishSocketConnection = (server) => {
             console.log(comment);
             io.emit('newComment', comment);
         });
+
+        socket.on('deleteComment', (commentId) => {
+
+            // TODO: Ensure the comment was actually deleted first.
+
+            // Broadcast to all clients that the comment was deleted.
+
+            io.emit('deleteComment', commentId);
+        });
+
         socket.on('disconnect',() =>{
             console.log('Client disconnected');
         });

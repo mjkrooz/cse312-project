@@ -19,7 +19,7 @@
 
             // Create a new comment HTML block.
 
-            let buffer = '<p style="border: 1px solid #AAA;padding: 5px;border-radius: 5px;"><b>'+comment.username+'</b> commented: '+comment.comment+'</p>';
+            let buffer = '<div id="comment-'+comment._id+'"><p style="border: 1px solid #AAA;padding: 5px;border-radius: 5px;"><b>'+comment.username+'</b> commented: '+comment.comment+'</p>';
 
             if (comment.user_id === '{{user_id}}') {
 
@@ -31,6 +31,7 @@
             buffer += '<div class="container" style="width: 30%;text-align: left;margin-top: 10px;">';
             buffer += 'Reports:';
             buffer += '<p><i>No reports for comment</i></p>';
+            buffer += '</div>';
 
             buffer += '<div>';
             buffer += '<label for="reportComment">Add report:</label><br>';
@@ -38,7 +39,22 @@
             buffer += '<input type="button" value="Report" onclick="addReportToComment(\''+comment._id+'\', \'{{csrf}}\');">';
             buffer += '</div>';
 
+            buffer += '</div>';
+
             commentsContainer.innerHTML += buffer;
+        });
+
+        socket.on('deleteComment', (commentId) => {
+            console.log(commentId);
+
+            const comment = document.getElementById('comment-' + commentId);
+
+            if (comment !== undefined && comment !== null) {
+
+
+
+                comment.remove();
+            }
         });
     </script>
 </head>
@@ -91,36 +107,38 @@
                         {{#if this.comments}}
                         
                             {{#each this.comments}}
-                                <p style="border: 1px solid #AAA;padding: 5px;border-radius: 5px;"><b>{{{this.user.username}}}</b> commented: {{{this.comment}}}</p>
-                                
-                                {{#objectIdEquals ../../user_id this.user_id}}
+                                <div id="comment-{{this._id}}">
+                                    <p style="border: 1px solid #AAA;padding: 5px;border-radius: 5px;"><b>{{{this.user.username}}}</b> commented: {{{this.comment}}}</p>
+                                    
+                                    {{#objectIdEquals ../../user_id this.user_id}}
 
-                                    <div class="form-group" style="text-align: center;">
-                                        <input type="button" class="delete" value="Delete Your Comment" onclick="deleteComment('{{this._id}}', '{{../../csrf}}',socket)">
-                                    </div>
-
-                                {{/objectIdEquals}}
-
-                                <div class="container" style="width: 30%;text-align: left;margin-top: 10px;">
-
-                                    {{#if this.reports}}
-                                        Reports:
-
-                                        <ul>
-                                            {{#each this.reports}}
-                                                <li><b>{{{this.reporter.username}}}</b>: {{{this.report}}}</li>
-                                            {{/each}}
-                                        </ul>
-                                    {{else}}
-                                        <p><i>No reports for comment</i></p>
-                                    {{/if}}
-                                    {{#if ../../username}}
-                                        <div>
-                                            <label for="reportComment">Add report:</label><br>
-                                            <textarea name="reportComment" id="reportComment-{{this._id}}"></textarea><br>
-                                            <input type="button" value="Report" onclick="addReportToComment('{{this._id}}', '{{../../csrf}}');">
+                                        <div class="form-group" style="text-align: center;">
+                                            <input type="button" class="delete" value="Delete Your Comment" onclick="deleteComment('{{this._id}}', '{{../../csrf}}',socket)">
                                         </div>
-                                    {{/if}}
+
+                                    {{/objectIdEquals}}
+
+                                    <div class="container" style="width: 30%;text-align: left;margin-top: 10px;">
+
+                                        {{#if this.reports}}
+                                            Reports:
+
+                                            <ul>
+                                                {{#each this.reports}}
+                                                    <li><b>{{{this.reporter.username}}}</b>: {{{this.report}}}</li>
+                                                {{/each}}
+                                            </ul>
+                                        {{else}}
+                                            <p><i>No reports for comment</i></p>
+                                        {{/if}}
+                                        {{#if ../../username}}
+                                            <div>
+                                                <label for="reportComment">Add report:</label><br>
+                                                <textarea name="reportComment" id="reportComment-{{this._id}}"></textarea><br>
+                                                <input type="button" value="Report" onclick="addReportToComment('{{this._id}}', '{{../../csrf}}');">
+                                            </div>
+                                        {{/if}}
+                                    </div>
                                 </div>
                             {{/each}}
                         {{else}}

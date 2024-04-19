@@ -71,7 +71,11 @@ function deleteComment(commentId, csrfToken, socket) {
             throw new Error('RESPONSE NOT OK');
         }
         alert('Comment deleted');
-        window.location = '/';
+        //window.location = '/';
+
+        // Emit on websocket so clients can have the comment deleted from their UIs.
+
+        socket.emit('deleteComment', commentId);
     })
     .catch(error =>{
         console.error('Error', error);
