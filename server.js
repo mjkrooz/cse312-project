@@ -12,7 +12,7 @@ const Post = require('./models/post')
 const {Comment} = require('./models/comment')
 const cookieParser = require('cookie-parser')
 const appVars = require('./middleware/appVars')
-const getUser = require('./middleware/getUser')
+const {getUser} = require('./middleware/getUser')
 require('dotenv').config()
 const handlebars = require('express-handlebars')
 const crypto = require('crypto');
@@ -320,7 +320,7 @@ app.get('/postpage.html', authenticate, generateCSRF, async (req, res) => {
 /**
  * Register API routes. All endpoints parse the body as JSON.
  */
-const apiRoutes = require('./routes/api')
+const {apiRoutes} = require('./routes/api')
 app.use('/api/v1', express.json(), apiRoutes);
 
 /**

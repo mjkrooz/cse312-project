@@ -9,7 +9,7 @@
 
 const express = require('express');
 const validator = require('validator');
-const app = express.Router();
+const apiRoutes = express.Router();
 const authenticate = require('../middleware/authenticate');
 const Post = require('../models/post');
 const { Comment, Report } = require('../models/comment');
@@ -34,7 +34,7 @@ const upload = multer({storage:storage})
  * 
  * Get all blog posts.
  */
-app.get('/posts', async (req, res) => {
+apiRoutes.get('/posts', async (req, res) => {
 
   const posts = await Post.find({});
 
@@ -46,7 +46,7 @@ app.get('/posts', async (req, res) => {
  * 
  * Create a new blog post.
  */
-app.post('/posts', upload.single('banner'), authenticate, validateCSRF, async (req, res) => {
+apiRoutes.post('/posts', upload.single('banner'), authenticate, validateCSRF, async (req, res) => {
 
   try {
 
@@ -89,7 +89,7 @@ app.post('/posts', upload.single('banner'), authenticate, validateCSRF, async (r
  * 
  * Get all comments on a particular blog post.
  */
-app.get('/posts/:id/comments', async (req, res) => {
+apiRoutes.get('/posts/:id/comments', async (req, res) => {
 
   const comments = await Comment.find({"post_id": req.params.id, "deleted": false});
 
@@ -101,30 +101,25 @@ app.get('/posts/:id/comments', async (req, res) => {
   res.send(comments);
 });
 
-/**
- * POST /api/v1/posts/:id/comments
- * 
- * Create a comment on a particular blog post.
- */
-app.post('/posts/:id/comments', authenticate, validateCSRF, async (req, res) => {
+async function createComment(postId, user, commentBody) {
 
   // Verify that the blog post actually exists.
 
   try {
 
-    const post = await Post.findById(req.params.id);
+    const post = await Post.findById(postId);
 
     if (post === null) {
   
-      return res.status(404).send({error: "Blog post not found"});
+      throw new Error('404');
     }
 
     // Create the comment.
   
     const comment = new Comment({
-      post_id: req.params.id,
-      user_id: req.cse312.user._id,
-      comment: validator.escape(req.body.comment)
+      post_id: postId,
+      user_id: user._id,
+      comment: validator.escape(commentBody)
     });
   
     // Save the comment.
@@ -137,13 +132,47 @@ app.post('/posts/:id/comments', authenticate, validateCSRF, async (req, res) => 
       user_id: comment.user_id,
       comment: comment.comment
     };
-  
-    res.status(201).send(output);
+
+    return output;
   } catch (error) {
+
+    // Pass 404 upwards.
+
+    if (error.message === '404') {
+
+      throw error;
+    }
+
+    // Wasn't a 404, send 500.
 
     console.log(error);
 
-    return res.sendStatus(500); // TODO: check if specifically a BSON error then 404?
+    throw new Error('500'); // TODO: check if specifically a BSON error then 404?
+  }
+}
+
+/**
+ * POST /api/v1/posts/:id/comments
+ * 
+ * Create a comment on a particular blog post.
+ */
+apiRoutes.post('/posts/:id/comments', authenticate, validateCSRF, async (req, res) => {
+
+  // Verify that the blog post actually exists.
+
+  try {
+
+    const output = createComment(req.params.id, req.cse312.user, req.body.comment);
+
+    res.status(201).send(output);
+  } catch (error) {
+
+    if (error.message === '404') {
+      
+      return res.status(404).send({error: "Blog post not found"});
+    }
+
+    return res.sendStatus(500);
   }
 });
 
@@ -152,7 +181,7 @@ app.post('/posts/:id/comments', authenticate, validateCSRF, async (req, res) => 
  * 
  * Get a specific comment from its ID.
  */
-app.get('/comments/:id', async (req, res) => {
+apiRoutes.get('/comments/:id', async (req, res) => {
 
   const comment = await Comment.findById(req.params.id);
 
@@ -176,7 +205,7 @@ app.get('/comments/:id', async (req, res) => {
  * 
  * Delete a specific comment. Requires the writer of the comment to be the deleter.
  */
-app.delete('/comments/:id', authenticate, validateCSRF, async (req, res) => {
+apiRoutes.delete('/comments/:id', authenticate, validateCSRF, async (req, res) => {
 
   const comment = await Comment.findById(req.params.id);
 
@@ -201,7 +230,7 @@ app.delete('/comments/:id', authenticate, validateCSRF, async (req, res) => {
  * 
  * Report a specific comment from its ID.
  */
-app.post('/comments/:id/report', authenticate, validateCSRF, async (req, res) => {
+apiRoutes.post('/comments/:id/report', authenticate, validateCSRF, async (req, res) => {
 
   // Verify that the comment actually exists.
 
@@ -249,7 +278,7 @@ app.post('/comments/:id/report', authenticate, validateCSRF, async (req, res) =>
  * 
  * Get a user by their ID.
  */
-app.get('/users/:id', async (req, res) => {
+apiRoutes.get('/users/:id', async (req, res) => {
 
   const user = await User.findById(req.params.id).select('username');
 
@@ -266,7 +295,7 @@ app.get('/users/:id', async (req, res) => {
  * 
  * Seed the database with defauly dummy data.
  */
-app.get('/seed', async (req, res) => {
+apiRoutes.get('/seed', async (req, res) => {
 
   // Seed users.
 
@@ -340,4 +369,4 @@ app.get('/seed', async (req, res) => {
   res.redirect('/');
 })
 
-module.exports = app
+module.exports = {apiRoutes, createComment}

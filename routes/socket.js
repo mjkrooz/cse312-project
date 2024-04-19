@@ -1,4 +1,8 @@
 const socketio = require('socket.io')
+const cookieParser = require('cookie-parser')
+const {parse} = require('cookie')
+const {getUserInstance} = require('../middleware/getUser')
+const {createComment} = require('../routes/api')
 
 const establishSocketConnection = (server) => {
     const io = socketio(server)
@@ -7,8 +11,28 @@ const establishSocketConnection = (server) => {
 
         console.log('Client connected');
         
-        socket.on('comment',(comment) =>{
+        socket.on('comment', async (rawComment) => {
+
+            // Parse cookies for authentication and get the user.
+
+            const cookies = parse(socket.handshake.headers.cookie);
+            const user = await getUserInstance('sessionToken' in cookies ? cookies.sessionToken : null);
+
+            // If the user was not authenticated, do not proceed.
+
+            if (user === null) {
+
+                return;
+            }
+
+            // Otherwise, create the comment.
+
+            const comment = await createComment(rawComment.postId, user, rawComment.comment);
+
+            // And then broadcast the comment to all connected clients.
+
             console.log(comment);
+            io.emit(comment);
         });
         socket.on('disconnect',() =>{
             console.log('Client disconnected');

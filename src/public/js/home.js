@@ -7,14 +7,21 @@ function addCommentToPost(postId, csrfToken,socket) {
     const data = {};
     const comment = document.getElementById('addComment-' + postId);
 
+    data.postId = postId;
     data.comment = comment.value;
     data.csrfToken = csrfToken;
 
-    socket.emit('comment',data)
-    
-    
+    // Emit the comment. Elsewhere, the comment will be collected (by all clients) and displayed.
 
-    fetch('/api/v1/posts/' + postId + '/comments',{
+    socket.emit('comment', data)
+    
+    // Get the container where the HTML for the comment is meant to go.
+
+    const commentsContainer = document.getElementById('comments-for-' + postId);
+    
+    // The following was used prior to the implementation of websockets.
+
+    /*fetch('/api/v1/posts/' + postId + '/comments',{
         method:'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -30,13 +37,13 @@ function addCommentToPost(postId, csrfToken,socket) {
     })
     .then(data => {
         console.log('Success', data);
-        alert('Comment created!');
-        window.location = '/';
+        //alert('Comment created!');
+        //window.location = '/';
     })
     .catch(error =>{
         console.error('Error', error);
         alert('Failed to create comment');
-    });
+    });*/
 }
 
 function deleteComment(commentId, csrfToken) {
