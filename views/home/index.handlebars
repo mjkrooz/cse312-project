@@ -6,6 +6,12 @@
     <link rel="stylesheet" href="/css/home.css">
     <title>Travel Blog</title>
 </head>
+
+  <script src="/socket.io/socket.io.js"></script>
+    <script>
+    const socket = io({transports: ['websocket']}); //prevents socket io from long polling
+    </script>
+
 <body>
     <div class="header">
         <div class="container form-group" style="text-align: center;">
@@ -47,7 +53,7 @@
                         <div class="container">
                             <label for="addComment">Add comment:</label><br>
                             <textarea name="addComment" id="addComment-{{this._id}}"></textarea><br>
-                            <input type="button" value="Comment" onclick="addCommentToPost('{{this._id}}', '{{../csrf}}');">
+                            <input type="button" value="Comment" onclick="addCommentToPost('{{this._id}}', '{{../csrf}}','{{socket}}')">
                         </div>
                     {{/if}}
                     <div class="container">
@@ -101,5 +107,8 @@
     </div>
 		
     <script src="/js/home.js"></script>
+
+  
+    
 </body>
 </html>

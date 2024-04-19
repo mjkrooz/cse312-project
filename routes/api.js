@@ -18,6 +18,7 @@ const {validateCSRF} = require('../middleware/csrf');
 const multer = require('multer')
 const path = require('path')
 
+
 const storage = multer.diskStorage({
   destination: function (req,file,cb) {
     media_path = path.join(__dirname,'../src/public/banner-uploads') //save the image to src/public/

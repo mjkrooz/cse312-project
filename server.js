@@ -18,6 +18,12 @@ const handlebars = require('express-handlebars')
 const crypto = require('crypto');
 const {validateCSRF, generateCSRF} = require('./middleware/csrf');
 const authenticate = require('./middleware/authenticate');
+const establishSocketConnection = require('./routes/socket')
+const http = require('http');
+const server = http.createServer(app);
+const io = establishSocketConnection(server);
+
+
 
 /**
  * Set up the Handlebars templating engine.
@@ -60,6 +66,8 @@ app.set('views', './views');
  * This including connecting to the database as well as setting the
  * X-Content-Type-Options header to "nosniff".
  */
+
+
 app.use(cookieParser(), appVars, function(req, res, next) {
 
   mongoose.connect('mongodb://db:27017/cse312');
@@ -326,6 +334,6 @@ app.use(express.static('src/public'));
 /**
  * Start the server.
  */
-app.listen(port, () => {
+server.listen(port, () => {
   console.log('Listening on port: ' + port);
 });

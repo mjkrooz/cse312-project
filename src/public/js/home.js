@@ -1,9 +1,11 @@
+import { io } from "socket.io-client";
+const socket  = io()
 
 window.onload = () => {
     document.getElementById('js-placeholder').innerHTML = 'No blog posts exist';
 };
 
-function addCommentToPost(postId, csrfToken) {
+function addCommentToPost(postId, csrfToken,socket) {
 
     const data = {};
     const comment = document.getElementById('addComment-' + postId);
@@ -11,6 +13,8 @@ function addCommentToPost(postId, csrfToken) {
     data.comment = comment.value;
     data.csrfToken = csrfToken;
 
+    socket.emit('comment',data)
+    
     fetch('/api/v1/posts/' + postId + '/comments',{
         method:'POST',
         headers: {
