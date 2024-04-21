@@ -10,8 +10,8 @@ services:
   db:
      image: mongo:7.0.0
    
-  nginx:
-    build: ./nginx
-    ports:
-      - '80:80'
-      - '443:443' 
+  #nginx:
+  #  build: ./nginx
+  #  ports:
+  #    - '80:80'
+  #    - '443:443' 
