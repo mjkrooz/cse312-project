@@ -20,6 +20,7 @@ const path = require('path');
 const { execSync } = require('child_process');
 const nodecron = require("node-cron");
 const cron = require("cron");
+const { unlink } = require("node:fs");
 
 function getMimetype(filepath) {
   try {
@@ -90,6 +91,10 @@ apiRoutes.post('/posts', upload.single('banner'), authenticate, validateCSRF, as
     const trueMimetype = getMimetype('/root/src/public/banner-uploads/' + req.file.filename);
 
     if (trueMimetype !== req.file.mimetype) {
+
+      // Delete the intermediate file.
+
+      unlink('/root/src/public/banner-uploads/' + req.file.filename, () => {});
 
       return res.sendStatus(400);
     }

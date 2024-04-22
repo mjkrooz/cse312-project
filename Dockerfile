@@ -4,7 +4,7 @@ ENV HOME /root
 WORKDIR /root
 
 COPY . .
-RUN mkdir ./src/public/banner-uploads
+RUN mkdir -p ./src/public/banner-uploads
 
 EXPOSE 8080
 
