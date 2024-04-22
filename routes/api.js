@@ -28,7 +28,18 @@ const storage = multer.diskStorage({
     cb(null,Date.now()+ path.extname(file.originalname)) //generate name for the file
   }
 })
-const upload = multer({storage:storage})
+const upload = multer({
+  storage:storage,
+  fileFilter(req, file, cb) {
+
+    if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png' || file.mimetype === 'image/gif') {
+
+      return cb(null, true)
+    }
+
+    return cb(new Error('Invalid upload, must be an image'), false)
+  }
+});
 /**
  * GET /api/v1/posts
  * 
@@ -52,7 +63,7 @@ apiRoutes.post('/posts', upload.single('banner'), authenticate, validateCSRF, as
 
     // Create the post.
 
-    console.log(req.file.path)
+    console.log(req.file.path);
 
     const post = new Post({
       user_id: req.cse312.user._id,
