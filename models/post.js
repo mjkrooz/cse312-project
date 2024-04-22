@@ -35,6 +35,13 @@ const postSchema = new mongoose.Schema(
         blurb: {
             type: String,
             required: true
+        },
+
+        // If 0, post is live. If more than 0, indicates the timestamp for when the post is released. A cronjob is responsible for performing the release.
+
+        scheduled: {
+            type: Number,
+            default: 0
         }
     }
 )

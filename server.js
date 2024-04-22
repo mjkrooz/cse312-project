@@ -22,6 +22,7 @@ const establishSocketConnection = require('./routes/socket')
 const http = require('http');
 const server = http.createServer(app);
 const io = establishSocketConnection(server);
+const cron = require("cron");
 
 
 
@@ -87,7 +88,7 @@ app.get('/', getUser, generateCSRF, async (req, res) => {
 
   // Get all posts to display on the home page.
 
-  const posts = await Post.find({});
+  const posts = await Post.find({scheduled: 0});
 
   // Render the "home/index" template.
 

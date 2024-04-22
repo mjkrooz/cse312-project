@@ -60,7 +60,7 @@ const upload = multer({
  */
 apiRoutes.get('/posts', async (req, res) => {
 
-  const posts = await Post.find({});
+  const posts = await Post.find({scheduled: 0});
 
   return res.send(posts);
 });
@@ -77,13 +77,11 @@ apiRoutes.post('/posts', upload.single('banner'), authenticate, validateCSRF, as
     // Verify the schedule is in the future.
 
     const scheduledDatetime = new Date(Date.parse(req.body.scheduledDatetime) + 100);
-    let releaseAt = new Date(Date.now() + 100);
     let scheduled = false;
 
-    if (scheduledDatetime !== "Invalid Date" && scheduledDatetime.getTime() > releaseAt.getTime()) {
+    if (scheduledDatetime !== "Invalid Date" && scheduledDatetime.getTime() > Date.now() + 100) {
 
       console.log('Scheduling post for: ' + scheduledDatetime.toISOString());
-      releaseAt = scheduledDatetime;
       scheduled = true;
     }
 
@@ -95,28 +93,37 @@ apiRoutes.post('/posts', upload.single('banner'), authenticate, validateCSRF, as
 
       return res.sendStatus(400);
     }
-      
 
-    // Create the post. Always uses a cron job, just that it's immediate if the user didn't schedule it for later.
+    // Create the post.
 
-    const job = new cron.CronJob(new Date(releaseAt), async function () {
+    const post = new Post({
+      user_id: req.cse312.user._id,
+      title: validator.escape(req.body.title),
+      banner: `banner-uploads/${req.file.filename}`, //banner image will be served via app.use(static)
+      content: validator.escape(req.body.content),
+      blurb: validator.escape(req.body.blurb),
+      scheduled: scheduled ? scheduledDatetime.getTime() : 0
+    });
 
-      console.log('creating post from cron');
+    // Save the post.
 
-      const post = new Post({
-        user_id: req.cse312.user._id,
-        title: validator.escape(req.body.title),
-        banner: `banner-uploads/${req.file.filename}`, //banner image will be served via app.use(static)
-        content: validator.escape(req.body.content),
-        blurb: validator.escape(req.body.blurb)
-      });
-  
-      // Save the post.
-  
-      await post.save();
-    }.bind(req));
+    await post.save();
 
-    job.start();
+    // If scheduled, schedule a cronjob to release the post.
+
+    if (scheduled) {
+
+      const job = new cron.CronJob(scheduledDatetime, async function () {
+
+        console.log('Releasing post from cron');
+
+        post.scheduled = 0;
+
+        await post.save();
+      }.bind(post));
+
+      job.start();
+    }
 
     // Send whether or not the post was set to be scheduled, so that the UI can respond accordingly.
 
