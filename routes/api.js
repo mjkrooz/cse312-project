@@ -137,6 +137,40 @@ apiRoutes.post('/posts', upload.single('banner'), authenticate, validateCSRF, as
 });
 
 /**
+ * GET /api/v1/posts/scheduled
+ * 
+ * Get all scheduled posts made by the current user.
+ */
+
+apiRoutes.get('/posts/scheduled', authenticate, async (req, res) => {
+
+  const posts = await Post.find({scheduled: { $gt: 0 }, user_id: req.cse312.user._id});
+
+  return res.send(posts);
+});
+
+/**
+ * GET /api/v1/posts/scheduled/:id/remaining-time
+ * 
+ * Get the number of seconds left before the given post is live.
+ */
+
+apiRoutes.get('/posts/scheduled/:id/remaining-time', authenticate, async (req, res) => {
+
+  const post = await Post.findOne({_id: req.params.id, user_id: req.cse312.user._id});
+
+  if (post.scheduled === 0) {
+
+    return res.send({remaining: 0});
+  }
+
+  const remaining = post.scheduled - Date.now();
+
+  return res.send({remaining: remaining});
+});
+
+
+/**
  * GET /api/v1/posts/:id/comments
  * 
  * Get all comments on a particular blog post.
