@@ -47,6 +47,11 @@
             </div>
 
             <div class="form-group">
+                <label for="blurb">Schedule Post (timezone: EST): </label>
+                <input type="datetime-local" id="scheduledDatetime" name="scheduled_datetime" value="" min="2024-04-21T00:00" max="2024-06-1T00:00" />
+            </div>
+
+            <div class="form-group">
                 <input type="submit" value="Send Post">
             </div>
             
@@ -84,6 +89,7 @@
             formData.append('content', document.getElementById("content").value);
             formData.append('blurb', document.getElementById("blurb").value);
             formData.append('csrfToken', '{{csrf}}');
+            formData.append('scheduledDatetime', document.getElementById("scheduledDatetime").value);
 
             fetch('/api/v1/posts/', {
                 method: 'POST',

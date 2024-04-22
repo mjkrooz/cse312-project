@@ -17,19 +17,19 @@ const User = require('../models/user');
 const {validateCSRF} = require('../middleware/csrf');
 const multer = require('multer');
 const path = require('path');
-const { exec } = require('child_process');
+const { execSync } = require('child_process');
+const nodecron = require("node-cron");
+const cron = require("cron");
 
 function getMimetype(filepath) {
+  try {
+    const stdout = execSync('file --mime-type ' + filepath, { encoding: 'utf-8' });
 
-  exec('file --mime-type ' + filepath, (err, stdout, stderr) => {
-
-    if (err) {
-
-      return "error";
-    }
-
-    return (stdout.split(/(\s+)/)).slice(-1)[0];
-  });
+    return (stdout.split(' ')[1]).trim();
+  } catch (error) {
+    console.error(error);
+    return "error";
+  }
 }
 
 const storage = multer.diskStorage({
@@ -74,40 +74,68 @@ apiRoutes.post('/posts', upload.single('banner'), authenticate, validateCSRF, as
 
   try {
 
-    // Create the post.
+    // Verify the schedule is in the future.
 
+    console.log(req.body.scheduledDatetime);
+    //console.log(Date.parse(req.body.scheduledDatetime));
+    //console.log(Date.now());
+
+    /*const scheduledDatetime = new Date(Date.parse(req.body.scheduleDatetime));
+    let releaseAt = new Date(Date.now() + 100);
+
+    console.log(scheduledDatetime);
+
+    if (scheduledDatetime !== "Invalid Date" && scheduledDatetime.getTime() > Date.now()) {
+
+      console.log('putting in future');
+      releaseAt = scheduledDatetime;
+    }*/
+
+    // Verify mimetype.
+    
     const trueMimetype = getMimetype('/root/src/public/banner-uploads/' + req.file.filename);
 
-    //if (trueMimetype !== req.file.mimetype) {
+    if (trueMimetype !== req.file.mimetype) {
 
-   //   return res.sendStatus(400);
-    //}
+      return res.sendStatus(400);
+    }
+      
 
-    console.log(req.file.mimetype);
-    console.log(getMimetype('/root/src/public/banner-uploads/' + req.file.filename));
+    // Create the post.
 
-    const post = new Post({
-      user_id: req.cse312.user._id,
-      title: validator.escape(req.body.title),
-      banner: `banner-uploads/${req.file.filename}`, //banner image will be served via app.use(static)
-      content: validator.escape(req.body.content),
-      blurb: validator.escape(req.body.blurb)
-    });
+    /*const job = new cron.CronJob(new Date(releaseAt), async function () {
 
-    // Save the post.
+      console.log('from cron');*/
+      //console.log(req);
 
-    await post.save();
+      const post = new Post({
+        user_id: req.cse312.user._id,
+        title: validator.escape(req.body.title),
+        banner: `banner-uploads/${req.file.filename}`, //banner image will be served via app.use(static)
+        content: validator.escape(req.body.content),
+        blurb: validator.escape(req.body.blurb)
+      });
+  
+      // Save the post.
+  
+      await post.save();
+  
+      const output = {
+        _id: post._id,
+        user_id: post.user_id,
+        title: post.title,
+        banner: post.banner,
+        content: post.content,
+        blurb: post.blurb
+      };
+    /*}.bind(req));
 
-    const output = {
-      _id: post._id,
-      user_id: post.user_id,
-      title: post.title,
-      banner: post.banner,
-      content: post.content,
-      blurb: post.blurb
-    };
+    console.log("done");
 
-    res.status(201).send(output);
+    job.start();
+    console.log("done2");*/
+
+    res.status(201).send({});
   } catch (error) {
 
     console.log(error);
