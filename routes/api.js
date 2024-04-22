@@ -15,9 +15,19 @@ const Post = require('../models/post');
 const { Comment, Report } = require('../models/comment');
 const User = require('../models/user');
 const {validateCSRF} = require('../middleware/csrf');
-const multer = require('multer')
-const path = require('path')
+const multer = require('multer');
+const path = require('path');
+const { exec } = require('child_process');
 
+function getMimetype(filepath) {
+
+  exec('file --mime-type ' + filepath, (err, stdout, stderr) => {
+  
+    // the *entire* stdout and stderr (buffered)
+    console.log(`stdout: ${stdout}`);
+    console.log(`stderr: ${stderr}`);
+  });
+}
 
 const storage = multer.diskStorage({
   destination: function (req,file,cb) {
@@ -63,7 +73,7 @@ apiRoutes.post('/posts', upload.single('banner'), authenticate, validateCSRF, as
 
     // Create the post.
 
-    console.log(req.file.path);
+    console.log(getMimetype('/root/src/public/banner-uploads/' + req.file.filename));
 
     const post = new Post({
       user_id: req.cse312.user._id,
