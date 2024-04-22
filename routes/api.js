@@ -78,10 +78,10 @@ apiRoutes.post('/posts', upload.single('banner'), authenticate, validateCSRF, as
 
     const trueMimetype = getMimetype('/root/src/public/banner-uploads/' + req.file.filename);
 
-    if (trueMimetype !== req.file.mimetype) {
+    //if (trueMimetype !== req.file.mimetype) {
 
-      return res.sendStatus(400);
-    }
+   //   return res.sendStatus(400);
+    //}
 
     console.log(req.file.mimetype);
     console.log(getMimetype('/root/src/public/banner-uploads/' + req.file.filename));
