@@ -76,20 +76,16 @@ apiRoutes.post('/posts', upload.single('banner'), authenticate, validateCSRF, as
 
     // Verify the schedule is in the future.
 
-    console.log(req.body.scheduledDatetime);
-    //console.log(Date.parse(req.body.scheduledDatetime));
-    //console.log(Date.now());
-
-    /*const scheduledDatetime = new Date(Date.parse(req.body.scheduleDatetime));
+    const scheduledDatetime = new Date(Date.parse(req.body.scheduledDatetime) + 100);
     let releaseAt = new Date(Date.now() + 100);
+    let scheduled = false;
 
-    console.log(scheduledDatetime);
+    if (scheduledDatetime !== "Invalid Date" && scheduledDatetime.getTime() > releaseAt.getTime()) {
 
-    if (scheduledDatetime !== "Invalid Date" && scheduledDatetime.getTime() > Date.now()) {
-
-      console.log('putting in future');
+      console.log('Scheduling post for: ' + scheduledDatetime.toISOString());
       releaseAt = scheduledDatetime;
-    }*/
+      scheduled = true;
+    }
 
     // Verify mimetype.
     
@@ -101,12 +97,11 @@ apiRoutes.post('/posts', upload.single('banner'), authenticate, validateCSRF, as
     }
       
 
-    // Create the post.
+    // Create the post. Always uses a cron job, just that it's immediate if the user didn't schedule it for later.
 
-    /*const job = new cron.CronJob(new Date(releaseAt), async function () {
+    const job = new cron.CronJob(new Date(releaseAt), async function () {
 
-      console.log('from cron');*/
-      //console.log(req);
+      console.log('creating post from cron');
 
       const post = new Post({
         user_id: req.cse312.user._id,
@@ -119,23 +114,13 @@ apiRoutes.post('/posts', upload.single('banner'), authenticate, validateCSRF, as
       // Save the post.
   
       await post.save();
-  
-      const output = {
-        _id: post._id,
-        user_id: post.user_id,
-        title: post.title,
-        banner: post.banner,
-        content: post.content,
-        blurb: post.blurb
-      };
-    /*}.bind(req));
-
-    console.log("done");
+    }.bind(req));
 
     job.start();
-    console.log("done2");*/
 
-    res.status(201).send({});
+    // Send whether or not the post was set to be scheduled, so that the UI can respond accordingly.
+
+    res.status(201).send({scheduled: scheduled});
   } catch (error) {
 
     console.log(error);

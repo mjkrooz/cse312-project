@@ -47,8 +47,8 @@
             </div>
 
             <div class="form-group">
-                <label for="blurb">Schedule Post (timezone: EST): </label>
-                <input type="datetime-local" id="scheduledDatetime" name="scheduled_datetime" value="" min="2024-04-21T00:00" max="2024-06-1T00:00" />
+                <label for="blurb">Schedule Post: </label>
+                <input type="datetime-local" id="scheduledDatetime" name="scheduleDatetime" value="" min="2024-04-21T00:00" max="2024-06-1T00:00" />
             </div>
 
             <div class="form-group">
@@ -89,7 +89,19 @@
             formData.append('content', document.getElementById("content").value);
             formData.append('blurb', document.getElementById("blurb").value);
             formData.append('csrfToken', '{{csrf}}');
-            formData.append('scheduledDatetime', document.getElementById("scheduledDatetime").value);
+
+            const rawDatetime = document.getElementById("scheduledDatetime").value;
+
+            if (rawDatetime !== '') {
+
+                const rawDate = new Date(rawDatetime);
+
+                formData.append('scheduledDatetime', rawDate === 'Invalid Date' ? '' : rawDate.toISOString());
+            } else {
+
+                formData.append('scheduledDatetime', '');
+            }
+
 
             fetch('/api/v1/posts/', {
                 method: 'POST',
@@ -105,7 +117,16 @@
             })
             .then(data => {
                 console.log('Success', data);
-                alert('POST CREATED!');
+
+                if (data.scheduled) {
+
+
+                    alert('POST SCHEDULED!');
+                } else {
+                    
+                    alert('POST CREATED!');
+                }
+
                 window.location = '/';
             })
             .catch(error =>{

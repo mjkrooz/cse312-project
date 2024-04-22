@@ -1,6 +1,4 @@
 window.onload = () => {
-    document.getElementById('js-placeholder').innerHTML = 'No blog posts exist';
-
     const jsPlaceholder = document.getElementById('js-placeholder');
 
     if (jsPlaceholder !== undefined && jsPlaceholder !== null) {
