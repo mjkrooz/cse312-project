@@ -22,10 +22,13 @@ const { exec } = require('child_process');
 function getMimetype(filepath) {
 
   exec('file --mime-type ' + filepath, (err, stdout, stderr) => {
-  
-    // the *entire* stdout and stderr (buffered)
-    console.log(`stdout: ${stdout}`);
-    console.log(`stderr: ${stderr}`);
+
+    if (err) {
+
+      return "error";
+    }
+
+    return (stdout.split(/(\s+)/)).slice(-1)[0];
   });
 }
 
@@ -73,6 +76,14 @@ apiRoutes.post('/posts', upload.single('banner'), authenticate, validateCSRF, as
 
     // Create the post.
 
+    const trueMimetype = getMimetype('/root/src/public/banner-uploads/' + req.file.filename);
+
+    if (trueMimetype !== req.file.mimetype) {
+
+      return res.sendStatus(400);
+    }
+
+    console.log(req.file.mimetype);
     console.log(getMimetype('/root/src/public/banner-uploads/' + req.file.filename));
 
     const post = new Post({
