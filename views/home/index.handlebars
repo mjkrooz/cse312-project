@@ -35,7 +35,7 @@
 
             buffer += '<div>';
             buffer += '<label for="reportComment">Add report:</label><br>';
-            buffer += '<textarea name="reportComment" id="reportComment-"'+comment._id+'></textarea><br>';
+            buffer += '<textarea name="reportComment" id="reportComment-'+comment._id+'"></textarea><br>';
             buffer += '<input type="button" value="Report" onclick="addReportToComment(\''+comment._id+'\', \'{{csrf}}\');">';
             buffer += '</div>';
 
