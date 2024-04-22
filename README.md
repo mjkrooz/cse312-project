@@ -4,9 +4,15 @@
 
 https://tobedetermined.blog
 
+## Part 3 AO1: Scheduled Posts
+
+When logged in, navigate to the "Create Post" form, which will include a "Schedule Post" input. Use this optional input to schedule a post to release at a particular date and time.
+
+A user can see their own scheduled posts on the home page. Those scheduled posts are retrieved from the server (endpoint: `GET /api/v1/posts/scheduled`). In particular, the time remaining will be shown and updated live, by retrieving the time remaining from the server (endpoint: `GET /api/v1/posts/scheduled/:id/remaining-time`). Once the countdown reaches 0, the post will be live for all users.
+
 ## Part 2 AO1: Multimedia Uploads
 
-Images may be uploaded in the "Create Post" form, accessed via the "Create Post" button on the home page. They are displayed alongside the post on the home page after submitting.
+A required banner image must be uploaded in the "Create Post" form, accessed via the "Create Post" button on the home page. They are displayed alongside the post on the home page after submitting.
 
 ## Part 2 AO2: WebSockets
 
