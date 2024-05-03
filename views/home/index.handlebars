@@ -86,6 +86,17 @@
         </div>
     {{/if}}
 
+    {{#if username}}
+        {{#if hasScheduledPosts}}
+            <div class="container" style="margin-bottom: 40px;">
+                <h3 style="text-align: center;">Your Scheduled Posts</h3>
+                <ul id="scheduledPosts">
+
+                </ul>
+            </div>
+        {{/if}}
+    {{/if}}
+
     <div class="post-container">
 
         {{#if posts}}

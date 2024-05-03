@@ -169,7 +169,7 @@ apiRoutes.get('/posts/scheduled/:id/remaining-time', authenticate, async (req, r
     return res.send({remaining: 0});
   }
 
-  const remaining = post.scheduled - Date.now();
+  const remaining = Math.ceil((post.scheduled - Date.now()) / 1000);
 
   return res.send({remaining: remaining});
 });

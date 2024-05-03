@@ -5,7 +5,76 @@ window.onload = () => {
 
         jsPlaceholder.innerHTML = 'No blog posts exist';
     }
+
+    getScheduledPosts();
+
+    setTimeout(updateScheduledPostTimers, 1000);
 };
+
+let scheduledPosts = [];
+
+function getScheduledPosts() {
+    
+    fetch('/api/v1/posts/scheduled')
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('RESPONSE NOT OK');
+        }
+
+        return response.json();
+    })
+    .then(posts => {
+
+        const postsContainer = document.getElementById('scheduledPosts');
+        postsContainer.innerHTML = '';
+
+        // Add the posts to the page.
+
+        posts.forEach(post => {
+            let buffer = '<li id="scheduled-post-' + post._id + '">';
+
+            buffer = buffer + '<b>' + post.title + '</b> releases in <span class="seconds_remaining">' + (Math.ceil((post.scheduled - Date.now()) / 1000)) + '</span> seconds.';
+            
+            buffer = buffer + '</li>';
+
+            postsContainer.innerHTML += buffer;
+
+            scheduledPosts.push({'id': post._id, 'el': 'scheduled-post-' + post._id});
+        });
+    })
+    .catch(error =>{
+        console.error('Error', error);
+    });
+}
+
+function updateScheduledPostTimers() {
+
+    scheduledPosts.forEach((post) => {
+
+        fetch('/api/v1/posts/scheduled/' + post.id + '/remaining-time')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('RESPONSE NOT OK');
+            }
+    
+            return response.json();
+        })
+        .then(json => {
+            const el = document.querySelector('#' + post.el + ' > .seconds_remaining');
+            el.innerHTML = json.remaining;
+
+            if (json.remaining === 0) {
+
+                window.location = '/';
+            }
+        })
+        .catch(error =>{
+            console.error('Error', error);
+        });
+    });
+
+    setTimeout(updateScheduledPostTimers, 1000);
+}
 
 function addCommentToPost(postId, csrfToken, socket) {
 

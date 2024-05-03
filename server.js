@@ -89,6 +89,7 @@ app.get('/', getUser, generateCSRF, async (req, res) => {
   // Get all posts to display on the home page.
 
   const posts = await Post.find({scheduled: 0});
+  const hasScheduledPosts = (req.cse312.user !== null) ? (await Post.findOne({scheduled: { $gt: 0 }, user_id: req.cse312.user._id})) !== null : false;
 
   // Render the "home/index" template.
 
@@ -97,6 +98,7 @@ app.get('/', getUser, generateCSRF, async (req, res) => {
     username: req.cse312.user === null ? null : req.cse312.user.username, // Set the username to nothing if a guest, or the username of the user.
     user_id: req.cse312.user === null ? null : req.cse312.user._id, // Set the user ID to nothing if a guest, or the ID of the user.
     csrf: req.cse312.user === null ? '' : req.cse312.user.csrfToken, // Set the CSRF token to that of the user's CSRF token, to be later validated.
+    hasScheduledPosts: hasScheduledPosts, // Whether the user has any scheduled posts.
 
     // A sadly-complex JSON object to represent all posts, as well as the relevant comment, user, and report data for each.
     // This has to be in JSON due to Handlebars restrictions.
