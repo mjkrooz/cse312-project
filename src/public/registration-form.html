@@ -43,7 +43,7 @@
             <li>1 number</li>
             <li>1 special character</li>
         </ul>
-        <form id="registration-form">
+        <form action="" id="registration-form" onsubmit="register_account(event)">
             <div class="form-group">
                 <label for="reg-form-username" class="form-label">Username:</label>
                 <input type="text" id="reg-form-username" name="username" required>
@@ -60,7 +60,7 @@
             </div>
 
             <div class="form-group">
-            <input type="button" value="Register Account" onclick="register_account()">
+            <input type="submit" value="Register Account">
 
             </div>
         </form>
@@ -69,7 +69,10 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
-        async function register_account() {
+        async function register_account(event) {
+
+            event.preventDefault();
+
             const username = document.getElementById('reg-form-username').value;
             const password = document.getElementById('reg-form-password').value;
             const password_confirm = document.getElementById('reg-form-pass-confirm').value;
