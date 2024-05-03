@@ -102,8 +102,7 @@ function deletePost(postId, csrfToken,socket) {
             }
             alert('Post Deleted')
 
-            socket.emit('deletePost', postId);
-
+            window.location = '/';
         })
         
         .catch(error => {
