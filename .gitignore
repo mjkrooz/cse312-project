@@ -1,3 +1,6 @@
+.idea/
+src/public/banner-uploads/
+
 # Logs
 logs
 *.log
