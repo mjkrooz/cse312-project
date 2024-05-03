@@ -35,7 +35,7 @@
 
             buffer += '<div>';
             buffer += '<label for="reportComment">Add report:</label><br>';
-            buffer += '<textarea name="reportComment" id="reportComment-'+comment._id+'"></textarea><br>';
+            buffer += '<textarea name="reportComment" id="reportComment-'+comment._id+'" maxlength="64"></textarea><br>';
             buffer += '<input type="button" value="Report" onclick="addReportToComment(\''+comment._id+'\', \'{{csrf}}\');">';
             buffer += '</div>';
 
@@ -112,7 +112,7 @@
                     {{#if ../username}}
                         <div class="container">
                             <label for="addComment">Add comment:</label><br>
-                            <textarea name="addComment" id="addComment-{{this._id}}"></textarea><br>
+                            <textarea name="addComment" id="addComment-{{this._id}}" maxlength="512"></textarea><br>
                             <input type="button" value="Comment" onclick="addCommentToPost('{{this._id}}', '{{../csrf}}',socket)">
                         </div>
                     {{/if}}
@@ -148,7 +148,7 @@
                                         {{#if ../../username}}
                                             <div>
                                                 <label for="reportComment">Add report:</label><br>
-                                                <textarea name="reportComment" id="reportComment-{{this._id}}"></textarea><br>
+                                                <textarea name="reportComment" id="reportComment-{{this._id}}" maxlength="64"></textarea><br>
                                                 <input type="button" value="Report" onclick="addReportToComment('{{this._id}}', '{{../../csrf}}');">
                                             </div>
                                         {{/if}}

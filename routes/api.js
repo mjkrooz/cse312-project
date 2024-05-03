@@ -103,10 +103,10 @@ apiRoutes.post('/posts', upload.single('banner'), authenticate, validateCSRF, as
 
     const post = new Post({
       user_id: req.cse312.user._id,
-      title: validator.escape(req.body.title),
+      title: validator.escape(req.body.title.substring(0, 64)),
       banner: `banner-uploads/${req.file.filename}`, //banner image will be served via app.use(static)
-      content: validator.escape(req.body.content),
-      blurb: validator.escape(req.body.blurb),
+      content: validator.escape(req.body.content.substring(0, 512)),
+      blurb: validator.escape(req.body.blurb.substring(0, 128)),
       scheduled: scheduled ? scheduledDatetime.getTime() : 0
     });
 
@@ -210,7 +210,7 @@ async function createComment(postId, user, commentBody) {
     const comment = new Comment({
       post_id: postId,
       user_id: user._id,
-      comment: validator.escape(commentBody)
+      comment: validator.escape(commentBody.substring(0, 512))
     });
   
     // Save the comment.
@@ -351,7 +351,7 @@ apiRoutes.post('/comments/:id/report', authenticate, validateCSRF, async (req, r
   
     const report = new Report({
       reporter: req.cse312.user._id,
-      report: validator.escape(req.body.report)
+      report: validator.escape(req.body.report.substring(0, 64))
     });
   
     // Save the report.

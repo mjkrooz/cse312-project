@@ -28,22 +28,22 @@
 
             <div class="form-group">
                 <label for="title">Title: </label> 
-                <input type="text" id="title" name="title" value="Title of the blog post" required><br><br>
+                <input type="text" id="title" name="title" value="Title of the blog post" required maxlength="64"><br><br>
             </div>
 
             <div class="form-group">
                 <label for="banner">Banner: </label> 
-                <input type="file" id="banner" name="banner" accept="image/*"><br><br>
+                <input type="file" id="banner" name="banner" accept="image/*" required><br><br>
             </div>
 
             <div class="form-group">
                 <label for="content">Content: </label>
-                <input type="text" id="content" name="content" value="The primary body of the blog post." required><br><br>
+                <input type="text" id="content" name="content" value="The primary body of the blog post." required maxlength="512"><br><br>
             </div>
 
             <div class="form-group">
                 <label for="blurb">Blurb: </label>
-                <input type="text" id="blurb" name="blurb" value="A short blurb under the title" required> <br><br>
+                <input type="text" id="blurb" name="blurb" value="A short blurb under the title" required maxlength="128"> <br><br>
             </div>
 
             <div class="form-group">
