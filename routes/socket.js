@@ -27,7 +27,15 @@ const establishSocketConnection = (server) => {
 
             // Otherwise, create the comment.
 
-            const comment = await createComment(rawComment.postId, user, rawComment.comment);
+            let comment = null;
+
+            try {
+
+                comment = await createComment(rawComment.postId, user, rawComment.comment);
+            } catch (error) {
+
+                return;
+            }
 
             // Attach the username of the commentor to the comment output.
 
