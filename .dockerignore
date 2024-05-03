@@ -3,12 +3,15 @@
 /node_modules
 /.pnp
 .pnp.js
-
+node_modules/
 # testing
 /coverage
-
+node_modules
 # production
 /build
+.idea
+.npm
+.vscode
 
 # misc
 .DS_Store

@@ -81,6 +81,38 @@ function deleteComment(commentId, csrfToken, socket) {
     });
 }
 
+function deletePost(postId, csrfToken,socket) {
+
+    const data = {};
+    data.csrfToken = csrfToken;
+
+
+    if (confirm("Are you sure you want to delete this post?")) {
+
+        fetch(`/api/v1/posts/`+postId, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to delete post');
+            }
+            alert('Post Deleted')
+
+            socket.emit('deletePost', postId);
+
+        })
+        
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to delete post');
+        });
+    }
+}
+
 function addReportToComment(commentId, csrfToken) {
 
     const data = {};
@@ -113,3 +145,4 @@ function addReportToComment(commentId, csrfToken) {
         alert('Failed to create report');
     });
 }
+

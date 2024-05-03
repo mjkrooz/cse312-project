@@ -52,10 +52,17 @@
             if (comment !== undefined && comment !== null) {
 
 
-
                 comment.remove();
             }
+        
         });
+
+        socket.on('deletePost',(postId) => {
+        console.log(postId);
+        });
+
+    
+        
     </script>
 </head>
 <body>
@@ -94,6 +101,13 @@
                     {{/if}}
 
                     <p>{{{this.content}}}</p>
+
+                    {{#objectIdEquals ../user_id this.user_id}}
+                        <div class="form-group" style="text-align: center;">
+                        <input type="button" class="delete" value="Delete Your Post" onclick="deletePost('{{this._id}}', '{{../csrf}}',socket)">
+                        </div>
+                    {{/objectIdEquals}}
+
                     <h3>Comments</h3>
                     {{#if ../username}}
                         <div class="container">

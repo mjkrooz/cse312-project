@@ -315,7 +315,18 @@ apiRoutes.delete('/comments/:id', authenticate, validateCSRF, async (req, res) =
   res.sendStatus(204);
 });
 
+apiRoutes.delete('/posts/:id',authenticate,validateCSRF,async(req,res)=> {
+  
+  const blog = await Post.findById(req.params.id)
 
+  if (blog == null){
+    return res.sendStatus(404);
+  }
+   
+  await Post.deleteOne({'_id': req.params.id});
+
+  res.sendStatus(204)
+})
 /**
  * POST /api/v1/comments/:id/report
  * 
