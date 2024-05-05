@@ -8,12 +8,14 @@ https://tobedetermined.blog
 The app now has a new "random joke" generator feature. All users are now able to navigate to the random joke generator page where they can fetch as many jokes as they'd like by clicking the "Fetch Joke" button. Whenever the user clicks on the "Fetch Joke" button an API call is made via axios to an external API which returns a random joke. This feature utilizes the free API: https://icanhazdadjoke.com/api#google_vignette.
 
 Testing Procedures:
-1. Navigate to the deployed apps homepage via: https://tobedetermined.blog/
+1. Navigate to the homepage via: https://tobedetermined.blog/.
 2. Click on the "Random Dad Jokes" button at the bottom of the page.
 3. Confirm that the page initially has no jokes.
 4. Click on the "Fetch Joke" button. Confirm that a random joke gets rendered on the page.
 5. Check the networks tab to verify that clicking the Fetch Joke button makes a HTTP GET request to "https://icanhazdadjoke.com/".
 6. Click on the "Fetch Joke" button several times. Confirm that a new joke is rendered each time the button is pressed.
+
+(Note: We have also added a "Switch Theme" feature as a backup/additional feature which allows the user to switch between regular and dark theme. Only applies for the home page")
 
 
 ## Part 3 AO1: Scheduled Posts
