@@ -23,7 +23,7 @@ const http = require('http');
 const server = http.createServer(app);
 const io = establishSocketConnection(server);
 const cron = require("cron");
-
+const requests = new Map();
 
 
 /**
@@ -75,6 +75,7 @@ app.use(cookieParser(), appVars, function(req, res, next) {
   res.append('X-Content-Type-Options', 'nosniff');
   next();
 });
+
 
 /**
  * GET /

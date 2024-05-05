@@ -7,7 +7,21 @@
     <title>Travel Blog</title>
 
     <script src="/socket.io/socket.io.js"></script>
+
+    
     <script>
+        
+        document.addEventListener('DOMContentLoaded', function() {
+
+            const nightModeToggle = document.getElementById('nightModeToggle');
+            const body = document.body;
+
+            nightModeToggle.addEventListener('click', function() {
+
+                body.classList.toggle('night-mode');
+            });
+        });
+    
         const socket = io({transports: ['websocket']}); //prevents socket io from long polling
 
         socket.on('newComment', (comment) => {
@@ -177,6 +191,12 @@
                 <p><i id="js-placeholder"></i></p>
             </div>
         {{/if}}
+            <div class="container form-group" style="text-align: center;">
+
+         <input type="button" id="nightModeToggle" value="Switch Theme">
+        <input type="button" value="Random Dad Jokes" onclick="window.location.href='joke.html';">
+        </div>
+
     </div>
 		
     <script src="/js/home.js"></script>

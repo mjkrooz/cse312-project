@@ -106,3 +106,9 @@ body > .container {
 .form-group input[type="button"].create:hover {
     background-color: #2a7e11;
 }
+
+/* Night Mode Styles */
+.night-mode {
+    background-color: #222; 
+    background-image: none;
+}
