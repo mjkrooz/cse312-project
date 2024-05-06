@@ -18,6 +18,7 @@ const handlebars = require('express-handlebars')
 const crypto = require('crypto');
 const {validateCSRF, generateCSRF} = require('./middleware/csrf');
 const authenticate = require('./middleware/authenticate');
+const rateLimit = require('./middleware/rateLimit');
 const establishSocketConnection = require('./routes/socket')
 const http = require('http');
 const server = http.createServer(app);
@@ -69,7 +70,7 @@ app.set('views', './views');
  */
 
 
-app.use(cookieParser(), appVars, function(req, res, next) {
+app.use(rateLimit, cookieParser(), appVars, function(req, res, next) {
 
   mongoose.connect('mongodb://db:27017/cse312');
   res.append('X-Content-Type-Options', 'nosniff');
