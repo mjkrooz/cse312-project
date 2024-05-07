@@ -9,11 +9,13 @@ The app now has a new "random joke" generator feature. All users are now able to
 
 Testing Procedures:
 1. Navigate to the homepage via: https://tobedetermined.blog/.
-2. Click on the "Random Dad Jokes" button at the bottom of the page.
-3. Confirm that the page initially has no jokes.
-4. Click on the "Fetch Joke" button. Confirm that a random joke gets rendered on the page.
-5. Check the networks tab to verify that clicking the Fetch Joke button makes a HTTP GET request to "https://icanhazdadjoke.com/".
-6. Click on the "Fetch Joke" button several times. Confirm that a new joke is rendered each time the button is pressed.
+2. Click "Register" and register an account.
+3. After being returned to the home page, click "Login" and log in using the same details used to create the account. This will redirect you back to the home page.
+4. Click on the "Random Dad Jokes" button at the bottom of the page.
+5. Confirm that the page initially has no jokes.
+6. Click on the "Fetch Joke" button. Confirm that a random joke gets rendered on the page.
+7. Check the networks tab to verify that clicking the Fetch Joke button makes a HTTP GET request to "https://icanhazdadjoke.com/".
+8. Click on the "Fetch Joke" button several times. Confirm that a new joke is rendered each time the button is pressed.
 
 (Note: We have also added a "Switch Theme" feature as a backup/additional feature which allows the user to switch between regular and dark theme. Only applies for the home page")
 
