@@ -5,12 +5,10 @@
 https://tobedetermined.blog
 
 ## Part 3 AO3: Random Joke Generator
-The app now has a new "random joke" generator feature. All logged-in users are now able to navigate to the random joke generator page where they can fetch as many jokes as they'd like by clicking the "Fetch Joke" button. Whenever the user clicks on the "Fetch Joke" button an API call is made via axios to an external API which returns a random joke. This feature utilizes the free API: https://icanhazdadjoke.com/api#google_vignette.
+The app now has a new "random joke" generator feature. All users are now able to navigate to the random joke generator page where they can fetch as many jokes as they'd like by clicking the "Fetch Joke" button. Whenever the user clicks on the "Fetch Joke" button an API call is made via axios to an external API which returns a random joke. This feature utilizes the free API: https://icanhazdadjoke.com/api#google_vignette.
 
 Testing Procedures:
 1. Navigate to the homepage via: https://tobedetermined.blog/.
-2. Click "Register" and register an account.
-3. After being returned to the home page, click "Login" and log in using the same details used to create the account. This will redirect you back to the home page.
 4. Click on the "Random Dad Jokes" button at the bottom of the page.
 5. Confirm that the page initially has no jokes.
 6. Click on the "Fetch Joke" button. Confirm that a random joke gets rendered on the page.
